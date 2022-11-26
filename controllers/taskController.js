@@ -17,14 +17,14 @@ export const createTask = (req, res) => {
                     message: "Autorization error"
                 })
             }            
-            const task = new TaskModel({
+            const doc = new TaskModel({
                 title: req.body.title,
                 subtitle: req.body.subtitle,
                 description: req.body.description,
                 author: decoded._id
             });
-            const newTask = await task.save();            
-            res.json(newTask)
+            const task = await doc.save();            
+            res.json(task)
         });
 
     } catch (err) {

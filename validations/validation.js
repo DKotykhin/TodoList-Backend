@@ -17,8 +17,14 @@ export const updateUserValidation = [
     body('name', 'Укажите имя, минимум 3 символа').optional().isLength({ min: 3 }),
 ];
 
-export const taskValidation = [
+export const taskCreateValidation = [
     body('title', 'Введите минимум 3 символа').isLength({ min: 3 }),
+    body('subtitle', 'Введите строку').optional().isString(),
+    body('description', 'Введите строку').optional().isString(),
+];
+
+export const taskUpdateValidation = [
+    body('title', 'Введите минимум 3 символа').optional().isLength({ min: 3 }),
     body('subtitle', 'Введите строку').optional().isString(),
     body('description', 'Введите строку').optional().isString(),
 ];
