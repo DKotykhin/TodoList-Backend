@@ -1,19 +1,22 @@
-import jwt from 'jsonwebtoken';
+import UserModel from '../models/User.js';
 
-export const uploadImage = (req, res) => { 
+export const uploadImage = async (req, res) => { 
     try {
-        const token = req.headers.authorization.split(' ')[1];
-        jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
-            if (err) {
-                return res.status(403).json({
-                    message: "Autorization error"
-                })
-            }            
-            res.json({
-                message: `${req.file.originalname} successfully upload`,
-                url: `/uploads/${req.file.filename}`
+        const user = await UserModel.findOneAndUpdate(
+            { _id: req.userId },
+            { avatarURL: `/uploads/${req.file.filename}` },
+            { returnDocument: 'after' },
+        );
+        if (!user) {
+            return res.status(404).json({
+                message: "Can't find user"
             })
-        });
+        }
+        res.json(user)           
+        // res.json({
+        //     message: `${req.file.originalname} successfully upload`,
+        //     url: `/uploads/${req.file.filename}`
+        // })
     } catch (err) {
         res.status(500).json({
             message: "Can't upload file"

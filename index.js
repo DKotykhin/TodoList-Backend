@@ -1,12 +1,12 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from 'dotenv';
-import multer from 'multer'
 
 import { registerUserValidation, loginUserValidation, updateUserValidation, taskCreateValidation, taskUpdateValidation } from './validations/validation.js';
 import { userLogin, userRegister, userDelete, userLoginByToken, userUpdate } from "./controllers/userController.js";
 import { createTask, deleteTask, getAllTasks, updateTask } from "./controllers/taskController.js";
-import { uploadImage } from './controllers/uploadController.js'
+import { uploadImage } from './controllers/uploadController.js';
+import { validationErrors, checkAuth, multerUpload } from './utils/index.js';
 
 dotenv.config();
 
@@ -17,29 +17,20 @@ mongoose
 
 const app = express();
 app.use(express.json());
+app.use('/api/upload', express.static('uploads'));
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads')
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname)
-    }
-});
-const upload = multer({ storage })
+app.post('/api/upload', checkAuth, multerUpload(), uploadImage);
 
-app.post('/api/upload', upload.single('image'), uploadImage)
+app.get('/api/user/loginbytoken', checkAuth, userLoginByToken);
+app.post('/api/user/login', loginUserValidation, validationErrors, userLogin);
+app.post('/api/user/register', registerUserValidation, validationErrors, userRegister);
+app.delete('/api/user/delete', checkAuth, userDelete);
+app.patch('/api/user/update', checkAuth, updateUserValidation, validationErrors, userUpdate);
 
-app.get('/api/user/loginbytoken', userLoginByToken);
-app.post('/api/user/login', loginUserValidation, userLogin);
-app.post('/api/user/register', registerUserValidation, userRegister);
-app.delete('/api/user/delete', userDelete);
-app.patch('/api/user/update', updateUserValidation, userUpdate);
-
-app.get('/api/task/getall', getAllTasks);
-app.post('/api/task/create', taskCreateValidation, createTask);
-app.delete('/api/task/delete', deleteTask);
-app.patch('/api/task/update', taskUpdateValidation, updateTask);
+app.get('/api/task/getall', checkAuth, getAllTasks);
+app.post('/api/task/create', checkAuth, taskCreateValidation, validationErrors, createTask);
+app.delete('/api/task/delete', checkAuth, deleteTask);
+app.patch('/api/task/update', checkAuth, taskUpdateValidation, validationErrors, updateTask);
 
 const PORT = process.env.PORT || 4001;
 app.listen(PORT, (err) => {
