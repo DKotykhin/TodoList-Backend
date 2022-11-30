@@ -4,8 +4,11 @@
     "description": "Node JS backend for TodoList",
     "main": "index.js",
     "type": "module",
+    "engines": {
+        "node": "14.x"
+    },
     "scripts": {
-        "start": "npm index.js",
+        "start": "node index.js",
         "dev": "nodemon index.js"
     },
     "keywords": [
