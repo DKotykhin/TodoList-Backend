@@ -19,6 +19,10 @@ const app = express();
 app.use(express.json());
 app.use('/api/upload', express.static('uploads'));
 
+app.get('/', (req, res) => {
+    res.send('<h1>Hello world</h1>')
+});
+
 app.post('/api/upload', checkAuth, multerUpload(), uploadImage);
 
 app.get('/api/user/loginbytoken', checkAuth, userLoginByToken);
