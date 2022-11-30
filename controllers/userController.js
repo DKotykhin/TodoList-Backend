@@ -12,15 +12,14 @@ export const userRegister = async (req, res) => {
             })
         }
 
-        const password = req.body.password;
+        const { email, name, password } = req.body;        
         const salt = await bcrypt.genSalt(10);
-        const passwordHash = await bcrypt.hash(password, salt)
+        const passwordHash = await bcrypt.hash(password, salt);
 
         const doc = new UserModel({
-            email: req.body.email,
-            passwordHash: passwordHash,
-            name: req.body.name,
-            avatarURL: req.body.avatarURL,
+            email,
+            passwordHash,
+            name,            
         });
         const user = await doc.save();
 
@@ -43,13 +42,14 @@ export const userRegister = async (req, res) => {
 
 export const userLogin = async (req, res) => {
     try {
-        const user = await UserModel.findOne({ email: req.body.email });
+        const { email, password } = req.body;
+        const user = await UserModel.findOne({ email });
         if (!user) {
             return res.status(404).json({
-                message: `Can't find user ${req.body.email}`
+                message: `Can't find user ${email}`
             })
         }
-        const isValidPass = await bcrypt.compare(req.body.password, user._doc.passwordHash)
+        const isValidPass = await bcrypt.compare(password, user._doc.passwordHash)
         if (!isValidPass) {
             return res.status(400).json({
                 message: 'Incorrect login or password'
@@ -89,15 +89,16 @@ export const userLoginByToken = async (req, res) => {
 
 export const userUpdate = async (req, res) => {
     try {
+        const { name, password } = req.body;
         let passwordHash;
-            if (req.body.password) {
+            if (password) {
                 const salt = await bcrypt.genSalt(10);
-                passwordHash = await bcrypt.hash(req.body.password, salt)
+                passwordHash = await bcrypt.hash(password, salt)
             }
 
             const user = await UserModel.findOneAndUpdate(
                 { _id: req.userId },
-                { name: req.body.name, passwordHash },
+                { name, passwordHash },
                 { returnDocument: 'after' },
             );
             if (!user) {

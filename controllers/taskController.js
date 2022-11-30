@@ -2,10 +2,11 @@ import TaskModel from '../models/Task.js';
 
 export const createTask = async (req, res) => {
     try {
+        const { title, subtitle, description } = req.body;
         const doc = new TaskModel({
-            title: req.body.title,
-            subtitle: req.body.subtitle,
-            description: req.body.description,
+            title,
+            subtitle,
+            description,
             author: req.userId
         });
         const task = await doc.save();
@@ -20,7 +21,8 @@ export const createTask = async (req, res) => {
 
 export const deleteTask = async (req, res) => {
     try {
-        const task = await TaskModel.deleteOne({ _id: req.body._id, author: req.userId });
+        const { _id } = req.body;
+        const task = await TaskModel.deleteOne({ _id, author: req.userId });
             if (!task) {
                 return res.status(404).json({
                     message: "Can't find task"
@@ -41,13 +43,14 @@ export const deleteTask = async (req, res) => {
 
 export const updateTask = async (req, res) => {
     try {
+        const { title, subtitle, description, _id } = req.body;
         const task = await TaskModel.updateOne(
-            { _id: req.body._id, author: req.userId },
+            { _id, author: req.userId },
             {
                 $set: {
-                    title: req.body.title,
-                    subtitle: req.body.subtitle,
-                    description: req.body.description
+                    title,
+                    subtitle,
+                    description,
                 }
             });
         if (!task) {
