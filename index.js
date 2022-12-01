@@ -25,16 +25,16 @@ app.use('/api/upload', express.static('uploads'));
 
 app.post('/api/upload', checkAuth, multerUpload(), uploadImage);
 
-app.get('/api/user/loginbytoken', checkAuth, userLoginByToken);
+app.get('/api/user/me', checkAuth, userLoginByToken);
 app.post('/api/user/login', loginUserValidation, validationErrors, userLogin);
 app.post('/api/user/register', registerUserValidation, validationErrors, userRegister);
-app.delete('/api/user/delete', checkAuth, userDelete);
-app.patch('/api/user/update', checkAuth, updateUserValidation, validationErrors, userUpdate);
+app.delete('/api/user/me', checkAuth, userDelete);
+app.patch('/api/user/me', checkAuth, updateUserValidation, validationErrors, userUpdate);
 
-app.get('/api/task/getall', checkAuth, getAllTasks);
-app.post('/api/task/create', checkAuth, taskCreateValidation, validationErrors, createTask);
-app.delete('/api/task/delete', checkAuth, deleteTask);
-app.patch('/api/task/update', checkAuth, taskUpdateValidation, validationErrors, updateTask);
+app.get('/api/task', checkAuth, getAllTasks);
+app.post('/api/task', checkAuth, taskCreateValidation, validationErrors, createTask);
+app.delete('/api/task', checkAuth, deleteTask);
+app.patch('/api/task', checkAuth, taskUpdateValidation, validationErrors, updateTask);
 
 const PORT = process.env.PORT || 4001;
 app.listen(PORT, (err) => {
