@@ -4,7 +4,7 @@ export const uploadImage = async (req, res) => {
     try {
         const user = await UserModel.findOneAndUpdate(
             { _id: req.userId },
-            { avatarURL: `/uploads/${req.file.filename}` },
+            { avatarURL: `/upload/${req.file.filename}` },
             { returnDocument: 'after' },
         );
         if (!user) {
