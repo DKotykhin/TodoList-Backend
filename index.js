@@ -1,7 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from 'dotenv';
-import cors from 'cors'
+import cors from 'cors';
 
 import { registerUserValidation, loginUserValidation, updateUserValidation, taskCreateValidation, taskUpdateValidation } from './validations/validation.js';
 import { userLogin, userRegister, userDelete, userLoginByToken, userUpdate } from "./controllers/userController.js";
