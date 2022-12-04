@@ -27,7 +27,7 @@ const multerUpload = () => {
         },
         limits: { fileSize: 1024000 },
     });
-    return upload.single('image')
+    return upload.single('avatar')
 }
 
 export default multerUpload;

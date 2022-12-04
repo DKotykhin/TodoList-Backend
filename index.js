@@ -6,7 +6,7 @@ import cors from 'cors';
 import { registerUserValidation, loginUserValidation, updateUserValidation, taskCreateValidation, taskUpdateValidation } from './validations/validation.js';
 import { userLogin, userRegister, userDelete, userLoginByToken, userUpdate } from "./controllers/userController.js";
 import { createTask, deleteTask, getAllTasks, updateTask } from "./controllers/taskController.js";
-import { uploadImage } from './controllers/uploadController.js';
+import { uploadImage, deleteImage } from './controllers/uploadController.js';
 import { validationErrors, checkAuth, multerUpload } from './utils/index.js';
 
 dotenv.config();
@@ -26,6 +26,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/upload', checkAuth, multerUpload(), uploadImage);
+app.delete('/api/upload/:avatarId', checkAuth, deleteImage);
 
 app.get('/api/user/me', checkAuth, userLoginByToken);
 app.post('/api/user/login', loginUserValidation, validationErrors, userLogin);
