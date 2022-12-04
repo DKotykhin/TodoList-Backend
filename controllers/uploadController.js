@@ -14,7 +14,11 @@ export const uploadImage = async (req, res) => {
                 message: "Can't find user"
             })
         }
-        res.json(user)
+        res.json(user.avatarURL)
+        res.status(200).send({
+            avatarURL: user.avatarURL,
+            message: "Avatar successfully upload.",
+        });
         // res.json({
         //     message: `${req.file.originalname} successfully upload`,
         //     url: `/uploads/${req.file.filename}`
@@ -35,18 +39,21 @@ export const deleteImage = async (req, res) => {
             return res.status(404).json({
                 message: "Can't find user"
             })
-        }
-        // const { _id } = user._doc;
-        // res.json(_id)
+        }  
         
-        fs.unlink(directoryPath + fileName, (err) => {
+        fs.unlink(directoryPath + fileName, async (err) => {
             if (err) {
                 res.status(500).send({
                     message: "Can't delete avatar. " + err,
                 });
             }
-
+            const updateUser = await UserModel.findOneAndUpdate(
+                { _id: req.userId },
+                { avatarURL: null },
+                { returnDocument: 'after' },
+            );
             res.status(200).send({
+                user: updateUser,
                 message: "Avatar successfully deleted.",
             });
         });                
