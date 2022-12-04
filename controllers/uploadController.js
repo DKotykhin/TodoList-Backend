@@ -14,7 +14,7 @@ export const uploadImage = async (req, res) => {
                 message: "Can't find user"
             })
         }
-        res.json(user.avatarURL)
+        // res.json(user.avatarURL)
         res.status(200).send({
             avatarURL: user.avatarURL,
             message: "Avatar successfully upload.",
@@ -55,7 +55,7 @@ export const deleteImage = async (req, res) => {
             res.status(200).send({
                 user: updateUser,
                 message: "Avatar successfully deleted.",
-            });
+            });            
         });                
 
     } catch (err) {
