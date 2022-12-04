@@ -6,7 +6,7 @@ export const uploadImage = async (req, res) => {
     try {
         const user = await UserModel.findOneAndUpdate(
             { _id: req.userId },
-            { avatarURL: `/upload/${req.file.filename}` },
+            { avatarURL: `/${req.file.filename}` },
             { returnDocument: 'after' },
         );
         if (!user) {
@@ -29,7 +29,7 @@ export const uploadImage = async (req, res) => {
 export const deleteImage = async (req, res) => {
     try {
         const fileName = req.params.avatarId;
-        const directoryPath = "uploads/";
+        const directoryPath = "uploads";
         const user = await UserModel.findById(req.userId);
         if (!user) {
             return res.status(404).json({
@@ -42,18 +42,18 @@ export const deleteImage = async (req, res) => {
         fs.unlink(directoryPath + fileName, (err) => {
             if (err) {
                 res.status(500).send({
-                    message: "Could not delete the file. " + err,
+                    message: "Can't delete avatar. " + err,
                 });
             }
 
             res.status(200).send({
-                message: "File is successfully deleted.",
+                message: "Avatar successfully deleted.",
             });
         });                
 
     } catch (err) {
         res.status(500).json({
-            message: "Can't delete file"
+            message: "Can't delete avatar"
         })
     }
 }
