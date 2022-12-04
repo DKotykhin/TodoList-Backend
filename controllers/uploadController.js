@@ -6,7 +6,7 @@ export const uploadImage = async (req, res) => {
     try {
         const user = await UserModel.findOneAndUpdate(
             { _id: req.userId },
-            { avatarURL: `/${req.file.filename}` },
+            { avatarURL: `/upload/${req.file.filename}` },
             { returnDocument: 'after' },
         );
         if (!user) {
@@ -29,7 +29,7 @@ export const uploadImage = async (req, res) => {
 export const deleteImage = async (req, res) => {
     try {
         const fileName = req.params.avatarId;
-        const directoryPath = "uploads";
+        const directoryPath = "uploads/";
         const user = await UserModel.findById(req.userId);
         if (!user) {
             return res.status(404).json({
