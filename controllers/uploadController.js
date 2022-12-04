@@ -13,19 +13,15 @@ export const uploadImage = async (req, res) => {
             return res.status(404).json({
                 message: "Can't find user"
             })
-        }
-        // res.json(user.avatarURL)
+        }        
         res.status(200).send({
             avatarURL: user.avatarURL,
             message: "Avatar successfully upload.",
         });
-        // res.json({
-        //     message: `${req.file.originalname} successfully upload`,
-        //     url: `/uploads/${req.file.filename}`
-        // })
+
     } catch (err) {
         res.status(500).json({
-            message: "Can't upload file"
+            message: "Can't upload avatar"
         })
     }
 }
@@ -52,8 +48,9 @@ export const deleteImage = async (req, res) => {
                 { avatarURL: null },
                 { returnDocument: 'after' },
             );
+            const { _id, email, name, avatarURL, createdAt } = updateUser._doc;
             res.status(200).send({
-                user: updateUser,
+                _id, email, name, avatarURL, createdAt,
                 message: "Avatar successfully deleted.",
             });            
         });                
