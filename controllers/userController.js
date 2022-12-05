@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import fs from 'fs';
 
 import UserModel from '../models/User.js';
 
@@ -30,11 +31,10 @@ export const userRegister = async (req, res) => {
             expiresIn: "7d"
         })
 
-        // res.json({ ...user._doc, token })
         const { _id, createdAt } = user._doc;
-        res.status(200).send({
+        res.status(201).send({
             _id, email, name, createdAt, token,
-            message: "User successfully created",
+            message: `User ${name} successfully created`,
         });
 
     } catch (err) {
@@ -71,7 +71,7 @@ export const userLogin = async (req, res) => {
         const { _id, name, avatarURL, createdAt } = user._doc;
         res.status(200).send({
             _id, email, name, avatarURL, createdAt, token,
-            message: "User successfully logged",
+            message: `User ${name} successfully logged`,
         });
 
     } catch (err) {
@@ -89,12 +89,10 @@ export const userLoginByToken = async (req, res) => {
                 message: "Can't find user"
             })
         }
-        // const { passwordHash, ...userData } = user._doc;
-        // res.json(userData)
         const { _id, email, name, avatarURL, createdAt } = user._doc;
         res.status(200).send({
             _id, email, name, avatarURL, createdAt,
-            message: "User successfully logged via token",
+            message: `User ${name} successfully logged via token`,
         });
 
     } catch (err) {
@@ -123,11 +121,10 @@ export const userUpdate = async (req, res) => {
                 message: "Can't find user"
             })
         }
-        // res.json(user)
         const { _id, email, avatarURL, createdAt } = user._doc;
         res.status(200).send({
             _id, email, name, avatarURL, createdAt,
-            message: "User successfully updated",
+            message: `User ${name} successfully updated`,
         });
     } catch (err) {
         res.status(500).json({
@@ -138,13 +135,24 @@ export const userUpdate = async (req, res) => {
 
 export const userDelete = async (req, res) => {
     try {
-        const user = await UserModel.deleteOne({ _id: req.userId });
+        const user = await UserModel.findById(req.userId);
         if (!user) {
             return res.status(404).json({
                 message: "Can't find user"
             })
         }
-        res.status(200).send({ message: 'User successfully deleted' })
+        if (user.avatarURL) {
+            fs.unlink("uploads" + user.avatarURL.slice(7), async (err) => {
+                if (err) {
+                    res.status(500).send({
+                        message: "Can't delete avatar. " + err,
+                    });
+                }
+            })
+        }
+        const status = await UserModel.deleteOne({ _id: req.userId });
+
+        res.status(200).send({ status, message: 'User successfully deleted' })
     } catch (err) {
         res.status(500).json({
             message: "Can't delete user"
