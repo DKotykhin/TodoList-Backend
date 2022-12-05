@@ -1,83 +1,90 @@
 import TaskModel from '../models/Task.js';
 
+export const getAllTasks = async (req, res) => {
+    try {
+        const allTask = await TaskModel.find(
+            { author: req.userId },
+            { title: true, subtitle: true, description: true, completed: true, createdAt: true }
+        );
+        res.status(200).send(allTask);
+    } catch (err) {
+        res.status(500).json({
+            message: "Can't find tasks"
+        })
+    }
+};
+
 export const createTask = async (req, res) => {
     try {
-        const { title, subtitle, description } = req.body;
+        const { title, subtitle, description, completed } = req.body;
         const doc = new TaskModel({
             title,
             subtitle,
             description,
+            completed,
             author: req.userId
         });
         const task = await doc.save();
-        res.json(task);
+        const { _id, createdAt } = task;
+        // res.json(task);
+        res.status(201).send({
+            _id, title, subtitle, description, completed, createdAt,
+            message: 'Task successfully created'
+        });
     } catch (err) {
         console.log(err)
         res.status(500).json({
             message: "Can't create task"
         })
     }
-}
-
-export const deleteTask = async (req, res) => {
-    try {
-        const { _id } = req.body;
-        const task = await TaskModel.deleteOne({ _id, author: req.userId });
-            if (!task) {
-                return res.status(404).json({
-                    message: "Can't find task"
-                })
-            }
-            if (!task.deletedCount) {
-                return res.status(403).json({
-                    message: "Deleted forbidden"
-                })
-            }
-            res.json({ message: 'Task successfully deleted' });
-    } catch (err) {
-        res.status(500).json({
-            message: "Can't delete task"
-        })
-    }
-}
+};
 
 export const updateTask = async (req, res) => {
     try {
-        const { title, subtitle, description, _id } = req.body;
-        const task = await TaskModel.updateOne(
+        const { title, subtitle, description, _id, completed } = req.body;
+        const status = await TaskModel.updateOne(
             { _id, author: req.userId },
             {
                 $set: {
                     title,
                     subtitle,
                     description,
+                    completed,
                 }
             });
-        if (!task) {
-            return res.status(404).json({
-                message: "Can't find task"
-            })
-        }
-        if (!task.modifiedCount) {
+
+        if (!status.modifiedCount) {
             return res.status(403).json({
                 message: "Modified forbidden"
             })
         }
-        res.json({ message: 'Task successfully updated', task });
+        res.status(200).send({
+            status,
+            message: 'Task successfully updated'
+        });
     } catch (err) {
         res.status(500).json({
             message: "Can't update task"
         })
     }
-}
+};
 
-export const getAllTasks = async (req, res) => {
+export const deleteTask = async (req, res) => {
     try {
-        const allTask = await TaskModel.find({ author: req.userId });
-            res.json(allTask);
+        const { _id } = req.body;
+        const status = await TaskModel.deleteOne({ _id, author: req.userId });
+        if (!status.deletedCount) {
+            return res.status(403).json({
+                message: "Deleted forbidden"
+            })
+        }
+        res.status(200).send({
+            status,
+            message: 'Task successfully deleted'
+        });
     } catch (err) {
         res.status(500).json({
-            message: "Can't find tasks"
+            message: "Can't delete task"
         })
     }
-}
+};

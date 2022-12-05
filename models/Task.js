@@ -13,6 +13,7 @@ const TaskSchema = new Schema({
         ref: 'User',
         required: true,       
     },
+    completed: Boolean
 }, {
     timestamps: true,
 });
