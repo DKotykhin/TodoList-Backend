@@ -4,7 +4,7 @@ export const getAllTasks = async (req, res) => {
     try {
         const allTask = await TaskModel.find(
             { author: req.userId },
-            { title: true, subtitle: true, description: true, completed: true, createdAt: true }
+            { title: true, subtitle: true, description: true, completed: true, createdAt: true, deadline: true }
         );
         res.status(200).send(allTask);
     } catch (err) {
