@@ -16,19 +16,20 @@ export const getAllTasks = async (req, res) => {
 
 export const createTask = async (req, res) => {
     try {
-        const { title, subtitle, description, completed } = req.body;
+        const { title, subtitle, description, completed, deadline } = req.body;
         const doc = new TaskModel({
             title,
             subtitle,
             description,
             completed,
+            deadline,
             author: req.userId
         });
         const task = await doc.save();
         const { _id, createdAt } = task;
         // res.json(task);
         res.status(201).send({
-            _id, title, subtitle, description, completed, createdAt,
+            _id, title, subtitle, description, completed, createdAt, deadline,
             message: 'Task successfully created'
         });
     } catch (err) {
@@ -41,7 +42,7 @@ export const createTask = async (req, res) => {
 
 export const updateTask = async (req, res) => {
     try {
-        const { title, subtitle, description, _id, completed } = req.body;
+        const { title, subtitle, description, _id, completed, deadline } = req.body;
         const status = await TaskModel.updateOne(
             { _id, author: req.userId },
             {
@@ -50,6 +51,7 @@ export const updateTask = async (req, res) => {
                     subtitle,
                     description,
                     completed,
+                    deadline
                 }
             });
 
