@@ -45,12 +45,12 @@ export const deleteImage = async (req, res) => {
             }
             const updateUser = await UserModel.findOneAndUpdate(
                 { _id: req.userId },
-                { avatarURL: null },
+                { avatarURL: '' },
                 { returnDocument: 'after' },
             );
-            const { _id, email, name, avatarURL, createdAt } = updateUser._doc;
+            
             res.status(200).send({
-                _id, email, name, avatarURL, createdAt,
+                avatarURL: updateUser.avatarURL,
                 message: "Avatar successfully deleted.",
             });            
         });                
