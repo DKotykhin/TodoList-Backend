@@ -2,7 +2,7 @@ import fs from 'fs';
 
 import UserModel from '../models/User.js';
 
-export const uploadImage = async (req, res) => {
+export const uploadAvatar = async (req, res) => {
     try {
         const user = await UserModel.findOneAndUpdate(
             { _id: req.userId },
@@ -26,10 +26,8 @@ export const uploadImage = async (req, res) => {
     }
 }
 
-export const deleteImage = async (req, res) => {
-    try {
-        const fileName = req.params.avatarId;
-        const directoryPath = "uploads/";
+export const deleteAvatar = async (req, res) => {
+    try {        
         const user = await UserModel.findById(req.userId);
         if (!user) {
             return res.status(404).json({
@@ -37,7 +35,7 @@ export const deleteImage = async (req, res) => {
             })
         }  
         
-        fs.unlink(directoryPath + fileName, async (err) => {
+        fs.unlink("uploads/" + user.avatarURL.split('/')[2], async (err) => {
             if (err) {
                 res.status(500).send({
                     message: "Can't delete avatar. " + err,

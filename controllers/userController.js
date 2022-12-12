@@ -3,7 +3,8 @@ import bcrypt from 'bcrypt';
 import fs from 'fs';
 
 import UserModel from '../models/User.js';
-import  {createPasswordHash}  from '../utils/createPasswordHash.js';
+import TaskModel from '../models/Task.js';
+import { createPasswordHash } from '../utils/createPasswordHash.js';
 
 export const userRegister = async (req, res) => {
     try {
@@ -15,12 +16,12 @@ export const userRegister = async (req, res) => {
             })
         }
 
-        const passwordHash = await createPasswordHash(password);    
+        const passwordHash = await createPasswordHash(password);
         const user = await UserModel.create({
             email,
             passwordHash,
             name,
-        });        
+        });
 
         const token = jwt.sign({
             _id: user._id,
@@ -51,7 +52,7 @@ export const userLogin = async (req, res) => {
             return res.status(404).json({
                 message: `Can't find user ${email}`
             })
-        }       
+        }
         const isValidPass = await bcrypt.compare(password, user.passwordHash)
         if (!isValidPass) {
             return res.status(400).json({
@@ -64,7 +65,7 @@ export const userLogin = async (req, res) => {
             process.env.SECRET_KEY, {
             expiresIn: "7d"
         });
-        
+
         const { _id, name, avatarURL, createdAt } = user;
         res.status(200).send({
             _id, email, name, avatarURL, createdAt, token,
@@ -137,8 +138,9 @@ export const userDelete = async (req, res) => {
                 message: "Can't find user"
             })
         }
+
         if (user.avatarURL) {
-            fs.unlink("uploads" + user.avatarURL.slice(7), async (err) => {
+            fs.unlink("uploads/" + user.avatarURL.split('/')[2], async (err) => {
                 if (err) {
                     res.status(500).send({
                         message: "Can't delete avatar. " + err,
@@ -146,9 +148,10 @@ export const userDelete = async (req, res) => {
                 }
             })
         }
-        const status = await UserModel.deleteOne({ _id: req.userId });
+        const taskStatus = await TaskModel.deleteMany({ author: req.userId });
+        const userStatus = await UserModel.deleteOne({ _id: req.userId });
 
-        res.status(200).send({ status, message: 'User successfully deleted' })
+        res.status(200).send({ taskStatus, userStatus, message: 'User successfully deleted' })
     } catch (err) {
         res.status(500).json({
             message: "Can't delete user"
@@ -165,8 +168,8 @@ export const confirmPassword = async (req, res) => {
                 message: "Can't find user"
             })
         }
-        const isValidPass = await bcrypt.compare(password, user.passwordHash);   
-        if (!isValidPass) {        
+        const isValidPass = await bcrypt.compare(password, user.passwordHash);
+        if (!isValidPass) {
             return res.status(200).send({ status: false, message: "Passwords don't match" })
         }
         res.status(200).send({ status: true, message: 'Password confirmed' })

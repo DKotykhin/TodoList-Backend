@@ -3,8 +3,9 @@ import { Router } from "express";
 import { registerUserValidation, loginUserValidation, updateUserValidation, taskCreateValidation, taskUpdateValidation } from '../validations/validation.js';
 import { userLogin, userRegister, userDelete, userLoginByToken, userUpdate, confirmPassword } from "../controllers/userController.js";
 import { createTask, deleteTask, getAllTasks, updateTask } from "../controllers/taskController.js";
-import { uploadImage, deleteImage } from '../controllers/uploadController.js';
-import { validationErrors, checkAuth, multerUpload } from '../utils/index.js';
+import { uploadAvatar, deleteAvatar } from '../controllers/uploadController.js';
+import { validationErrors, checkAuth } from '../middlewares/index.js';
+import multerUpload from '../utils/multerUpload.js'
 
 const router = new Router();
 
@@ -15,8 +16,8 @@ router.post('/user/password', checkAuth, confirmPassword);
 router.delete('/user/me', checkAuth, userDelete);
 router.patch('/user/me', checkAuth, updateUserValidation, validationErrors, userUpdate);
 
-router.post('/upload', checkAuth, multerUpload(), uploadImage);
-router.delete('/upload/:avatarId', checkAuth, deleteImage);
+router.post('/upload', checkAuth, multerUpload(), uploadAvatar);
+router.delete('/upload', checkAuth, deleteAvatar);
 
 router.get('/task', checkAuth, getAllTasks);
 router.post('/task', checkAuth, taskCreateValidation, validationErrors, createTask);
