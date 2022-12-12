@@ -105,6 +105,16 @@ export const userUpdate = async (req, res) => {
         const { name, password } = req.body;
         let passwordHash;
         if (password) {
+            const user = await UserModel.findById(req.userId);
+            if (!user) {
+                return res.status(404).json({
+                    message: "Can't find user"
+                })
+            }
+            const isValidPass = await bcrypt.compare(password, user.passwordHash);
+            if (isValidPass) {
+                return res.status(400).send({ message: "The same password!" })
+            }
             passwordHash = await createPasswordHash(password);
         }
 
@@ -120,8 +130,8 @@ export const userUpdate = async (req, res) => {
         }
         const { _id, email, avatarURL, createdAt } = user;
         res.status(200).send({
-            _id, email, name, avatarURL, createdAt,
-            message: `User ${name} successfully updated`,
+            _id, email, name: user.name, avatarURL, createdAt,
+            message: `User ${user.name} successfully updated`,
         });
     } catch (err) {
         res.status(500).json({
@@ -170,7 +180,7 @@ export const confirmPassword = async (req, res) => {
         }
         const isValidPass = await bcrypt.compare(password, user.passwordHash);
         if (!isValidPass) {
-            return res.status(200).send({ status: false, message: "Passwords don't match" })
+            return res.status(200).send({ status: false, message: "Wrong password!" })
         }
         res.status(200).send({ status: true, message: 'Password confirmed' })
 
