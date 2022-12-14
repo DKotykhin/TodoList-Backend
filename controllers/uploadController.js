@@ -1,5 +1,4 @@
 import fs from 'fs';
-
 import UserModel from '../models/User.js';
 
 export const uploadAvatar = async (req, res) => {
@@ -13,7 +12,7 @@ export const uploadAvatar = async (req, res) => {
             return res.status(404).json({
                 message: "Can't find user"
             })
-        }        
+        }
         res.status(200).send({
             avatarURL: user.avatarURL,
             message: "Avatar successfully upload.",
@@ -21,20 +20,21 @@ export const uploadAvatar = async (req, res) => {
 
     } catch (err) {
         res.status(500).json({
+            err: err.message,
             message: "Can't upload avatar"
         })
     }
 }
 
 export const deleteAvatar = async (req, res) => {
-    try {        
+    try {
         const user = await UserModel.findById(req.userId);
         if (!user) {
             return res.status(404).json({
                 message: "Can't find user"
             })
-        }  
-        
+        }
+
         fs.unlink("uploads/" + user.avatarURL.split('/')[2], async (err) => {
             if (err) {
                 res.status(500).send({
@@ -46,12 +46,12 @@ export const deleteAvatar = async (req, res) => {
                 { avatarURL: '' },
                 { returnDocument: 'after' },
             );
-            
+
             res.status(200).send({
                 avatarURL: updateUser.avatarURL,
                 message: "Avatar successfully deleted.",
-            });            
-        });                
+            });
+        });
 
     } catch (err) {
         res.status(500).json({

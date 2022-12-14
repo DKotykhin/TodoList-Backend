@@ -4,8 +4,8 @@ import { registerUserValidation, loginUserValidation, updateUserValidation, task
 import { userLogin, userRegister, userDelete, userLoginByToken, userUpdate, confirmPassword } from "../controllers/userController.js";
 import { createTask, deleteTask, getAllTasks, updateTask } from "../controllers/taskController.js";
 import { uploadAvatar, deleteAvatar } from '../controllers/uploadController.js';
-import { validationErrors, checkAuth } from '../middlewares/index.js';
-import multerUpload from '../utils/multerUpload.js'
+import { validationErrors, checkAuth, errorHandler } from '../middlewares/index.js';
+import { upload } from '../utils/multerUpload.js'
 
 const router = new Router();
 
@@ -16,7 +16,7 @@ router.post('/user/password', checkAuth, confirmPassword);
 router.delete('/user/me', checkAuth, userDelete);
 router.patch('/user/me', checkAuth, updateUserValidation, validationErrors, userUpdate);
 
-router.post('/upload', checkAuth, multerUpload(), uploadAvatar);
+router.post('/upload', checkAuth, upload.single('avatar'), errorHandler, uploadAvatar);
 router.delete('/upload', checkAuth, deleteAvatar);
 
 router.get('/task', checkAuth, getAllTasks);
