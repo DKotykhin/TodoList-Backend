@@ -9,7 +9,7 @@ export const getAllTasks = async (req, res) => {
         res.status(200).send(allTask);
     } catch (err) {
         res.status(500).json({
-            message: "Can't find tasks"
+            message: err.message
         })
     }
 };
@@ -35,7 +35,7 @@ export const createTask = async (req, res) => {
     } catch (err) {
         console.log(err)
         res.status(500).json({
-            message: "Can't create task"
+            message: err.message
         })
     }
 };
@@ -66,7 +66,7 @@ export const updateTask = async (req, res) => {
         });
     } catch (err) {
         res.status(500).json({
-            message: "Can't update task"
+            message: err.message
         })
     }
 };
@@ -86,7 +86,7 @@ export const deleteTask = async (req, res) => {
         });
     } catch (err) {
         res.status(500).json({
-            message: "Can't delete task"
+            message: err.message
         })
     }
 };

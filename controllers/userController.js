@@ -36,10 +36,9 @@ export const userRegister = async (req, res) => {
             message: `User ${name} successfully created`,
         });
 
-    } catch (err) {
-        console.log(err)
+    } catch (err) {        
         res.status(500).json({
-            message: "Can't register user"
+            message: err.message
         })
     }
 }
@@ -63,7 +62,7 @@ export const userLogin = async (req, res) => {
             _id: user._id,
         },
             process.env.SECRET_KEY, {
-            expiresIn: "7d"
+            expiresIn: "2d"
         });
 
         const { _id, name, avatarURL, createdAt } = user;
@@ -73,8 +72,8 @@ export const userLogin = async (req, res) => {
         });
 
     } catch (err) {
-        res.status(500).json({
-            message: 'Autorization error'
+        res.status(500).json({            
+            message: err.message
         })
     }
 }
@@ -164,7 +163,7 @@ export const userDelete = async (req, res) => {
         res.status(200).send({ taskStatus, userStatus, message: 'User successfully deleted' })
     } catch (err) {
         res.status(500).json({
-            message: "Can't delete user"
+            message: err.message
         })
     }
 }
@@ -186,7 +185,7 @@ export const confirmPassword = async (req, res) => {
 
     } catch (err) {
         res.status(500).json({
-            message: "Can't confirm password"
+            message: err.message
         })
     }
 }

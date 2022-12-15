@@ -19,7 +19,7 @@ const checkAuth = (req, res, next) => {
         });
     } catch (err) {
         return res.status(500).json({
-            message: "Autorization error"
+            message: err.message
         })
     } 
 }
