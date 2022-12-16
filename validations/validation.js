@@ -22,7 +22,7 @@ export const taskCreateValidation = [
     body('subtitle', 'Incorrect data format').optional().isString(),
     body('description', 'Incorrect data format').optional().isString(),
     body('completed', 'Incorrect data format').isBoolean(),
-    body('deadline', 'Incorrect data format').optional().isISO8601(),
+    body('deadline', 'Incorrect data format').optional().isString(),
 ];
 
 export const taskUpdateValidation = [
