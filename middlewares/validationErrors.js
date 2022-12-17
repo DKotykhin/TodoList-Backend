@@ -1,9 +1,11 @@
 import { validationResult } from 'express-validator';
 
+import ApiError from '../error/apiError.js';
+
 const validationErrors = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ message: errors.array()[0].msg });
+        return next(ApiError.badRequest(errors.array()[0].msg))
     }
     next()
 }

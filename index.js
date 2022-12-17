@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 
 import router from './router/router.js';
+import { errorHandler } from "./middlewares/index.js";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use('/api', router);
 app.get('/', (req, res) => {
     res.send('<h1>Hello from server</h1>')
 });
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 4001;
 app.listen(PORT, (err) => {

@@ -1,6 +1,8 @@
 import multer from 'multer';
 import fs from 'fs';
 
+import ApiError from '../error/apiError.js';
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         if (!fs.existsSync('uploads')) {
@@ -19,7 +21,7 @@ const fileFilter = (req, file, cb) => {
         file.mimetype === 'image/png') {
         cb(null, true)
     } else {
-        cb(new Error('Wrong file format'), false)
+        cb(ApiError.internalError('Wrong file format'), false)
     }
 }
 

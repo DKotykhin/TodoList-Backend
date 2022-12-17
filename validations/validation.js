@@ -1,34 +1,51 @@
 import { body } from 'express-validator';
 
+const email = body('email')
+    .isEmail().withMessage('Incorrect email format');
+
+const password = body('password')
+    .isString().withMessage('Incorrect data format')
+    .isLength({ min: 8 }).withMessage('Password must be at least 8 chars long');
+
 export const registerUserValidation = [
-    body('email', 'Incorrect email format').isEmail(),
-    body('password', 'Password must be at least 8 chars long').isLength({ min: 8 }),
-    body('name', 'Name must be at least 3 chars long').isLength({ min: 3 }),
-    body('avatarURL', 'Incorrect URL').optional().isURL(),
+    email,
+    password,
+    body('name')
+        .isString().withMessage('Incorrect data format')
+        .isLength({ min: 3 }).withMessage('Name must be at least 3 chars long'),
+    body('avatarURL')
+        .optional().isURL().withMessage('Incorrect URL')
 ];
 
 export const loginUserValidation = [
-    body('email', 'Incorrect email format').isEmail(),
-    body('password', 'Password must be at least 8 chars long').isLength({ min: 8 }),   
+    email,
+    password
+];
+
+export const passwordValidation = [
+    password
 ];
 
 export const updateUserValidation = [
-    body('password', 'Password must be at least 8 chars long').optional().isLength({ min: 8 }),   
-    body('name', 'Name must be at least 3 chars long').optional().isLength({ min: 3 }),
+    body('name')
+        .optional()
+        .isString().withMessage('Incorrect data format')
+        .isLength({ min: 3 }).withMessage('Name must be at least 3 chars long'),
+    body('password')
+        .optional()
+        .isString().withMessage('Incorrect data format')
+        .isLength({ min: 8 }).withMessage('Password must be at least 8 chars long')
 ];
 
-export const taskCreateValidation = [
-    body('title', 'Title must be at least 3 chars long').isLength({ min: 3 }),
-    body('subtitle', 'Incorrect data format').optional().isString(),
-    body('description', 'Incorrect data format').optional().isString(),
-    body('completed', 'Incorrect data format').isBoolean(),
-    body('deadline', 'Incorrect data format').optional().isString(),
-];
-
-export const taskUpdateValidation = [
-    body('title', 'Title must be at least 3 chars long').optional().isLength({ min: 3 }),
-    body('subtitle', 'Incorrect data format').optional().isString(),
-    body('description', 'Incorrect data format').optional().isString(),
-    body('completed', 'Incorrect data format').isBoolean(),
-    body('deadline', 'Incorrect data format').optional().isString(),
+export const taskValidation = [
+    body('title')
+        .isLength({ min: 3 }).withMessage('Title must be at least 3 chars long'),
+    body('subtitle')
+        .optional().isString().withMessage('Incorrect data format'),
+    body('description')
+        .optional().isString().withMessage('Incorrect data format'),
+    body('completed')
+        .isBoolean().withMessage('Incorrect data format'),
+    body('deadline')
+        .optional().isString().withMessage('Incorrect data format'),
 ];
