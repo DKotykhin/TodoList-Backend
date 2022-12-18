@@ -3,7 +3,10 @@ import fs from 'fs';
 import UserModel from '../models/User.js';
 import ApiError from '../error/apiError.js';
 
-export const uploadAvatar = async (req, res, next) => {
+export const uploadAvatar = async (req, res, next) => {    
+    if (!req.file) {
+        return next(ApiError.notFound("No file to upload"))
+    }
     const user = await UserModel.findOneAndUpdate(
         { _id: req.userId },
         { avatarURL: `/upload/${req.file.filename}` },

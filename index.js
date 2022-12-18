@@ -15,7 +15,7 @@ mongoose
 
 const app = express();
 
-app.use(cors())
+app.use(cors());
 app.use(express.json());
 
 app.use('/api/upload', express.static('uploads'));
@@ -32,4 +32,4 @@ app.listen(PORT, (err) => {
         return console.log(err)
     }
     console.log(`Server has been started on port ${PORT}...`)
-})
+});
