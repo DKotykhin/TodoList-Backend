@@ -78,30 +78,32 @@ export const userUpdate = async (req, res, next) => {
     }
     const { name, password } = req.body;
     let passwordHash;
+    const user = await UserModel.findById(req.userId);
+    if (!user) {
+        return next(ApiError.notFound("Can't find user"))
+    }
     if (password) {
-        const user = await UserModel.findById(req.userId);
-        if (!user) {
-            return next(ApiError.notFound("Can't find user"))
-        }
         const isValidPass = await bcrypt.compare(password, user.passwordHash);
         if (isValidPass) {
             return next(ApiError.badRequest("The same password!"))
         }
         passwordHash = await createPasswordHash(password);
     }
-    const user = await UserModel.findOneAndUpdate(
+    if (name) {
+        if (name === user.name) {
+            return next(ApiError.badRequest("The same name!"))
+        }
+    }
+    const newUser = await UserModel.findOneAndUpdate(
         { _id: req.userId },
         { name, passwordHash },
         { returnDocument: 'after' },
-    );
-    if (!user) {
-        return next(ApiError.notFound("Can't find user"))
-    }
-    const { _id, email, avatarURL, createdAt } = user;
+    );    
+    const { _id, email, avatarURL, createdAt } = newUser;
 
     res.status(200).send({
-        _id, email, name: user.name, avatarURL, createdAt,
-        message: `User ${user.name} successfully updated`,
+        _id, email, name: newUser.name, avatarURL, createdAt,
+        message: `User ${newUser.name} successfully updated`,
     });
 }
 
