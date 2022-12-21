@@ -6,13 +6,29 @@ export const getAllTasks = async (req, res) => {
     const tasksOnPage = req.query.limit > 0 ? req.query.limit : 0;
     const pageNumber = req.query.page > 0 ? req.query.page : 1;
 
-    const totalTasksQty = (await TaskModel.find({ author: req.userId })).length;
+    let taskKey = 0;
+    switch (req.query.key) {
+        case '0': taskKey = { author: req.userId }
+            break;
+        case '1': taskKey = { author: req.userId, completed: false }
+            break;
+        case '2': taskKey = { author: req.userId, completed: true }
+            break;
+        default: taskKey = { author: req.userId }
+    }
+
+    const totalTasksQty = (await TaskModel.find(taskKey)).length;
     const totalPagesQty = Math.ceil(totalTasksQty / tasksOnPage);
 
-    const tasks = await TaskModel.find(
-        { author: req.userId },
-        { title: true, subtitle: true, description: true, completed: true, createdAt: true, deadline: true }
-    ).limit(tasksOnPage).skip((pageNumber - 1) * tasksOnPage);
+    const tasks = await TaskModel.find(taskKey, {
+        title: true,
+        subtitle: true,
+        description: true,
+        completed: true,
+        createdAt: true,
+        deadline: true
+    }).limit(tasksOnPage).skip((pageNumber - 1) * tasksOnPage);
+
     const tasksOnPageQty = tasks.length;
 
     res.status(200).send({ totalTasksQty, totalPagesQty, tasksOnPageQty, tasks });
