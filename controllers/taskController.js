@@ -2,15 +2,23 @@ import ApiError from '../error/apiError.js';
 import TaskModel from '../models/Task.js';
 
 export const getAllTasks = async (req, res) => {
-    const allTask = await TaskModel.find(
+
+    const tasksOnPage = req.query.limit > 0 ? req.query.limit : 0;
+    const pageNumber = req.query.page > 0 ? req.query.page : 1;
+
+    const totalTasksQty = (await TaskModel.find({ author: req.userId })).length;
+    const totalPagesQty = Math.ceil(totalTasksQty / tasksOnPage);
+
+    const tasks = await TaskModel.find(
         { author: req.userId },
         { title: true, subtitle: true, description: true, completed: true, createdAt: true, deadline: true }
-    );
+    ).limit(tasksOnPage).skip((pageNumber - 1) * tasksOnPage);
+    const tasksOnPageQty = tasks.length;
 
-    res.status(200).send(allTask);
+    res.status(200).send({ totalTasksQty, totalPagesQty, tasksOnPageQty, tasks });
 };
 
-export const createTask = async (req, res, next) => {   
+export const createTask = async (req, res, next) => {
     const { title, subtitle, description, completed, deadline } = req.body;
     const doc = new TaskModel({
         title,
@@ -29,7 +37,7 @@ export const createTask = async (req, res, next) => {
     });
 };
 
-export const updateTask = async (req, res, next) => {    
+export const updateTask = async (req, res, next) => {
     const { title, subtitle, description, _id, completed, deadline } = req.body;
     const status = await TaskModel.updateOne(
         { _id, author: req.userId },
@@ -52,7 +60,7 @@ export const updateTask = async (req, res, next) => {
     });
 };
 
-export const deleteTask = async (req, res, next) => {    
+export const deleteTask = async (req, res, next) => {
     const { _id } = req.body;
     const status = await TaskModel.deleteOne({ _id, author: req.userId });
     if (!status.deletedCount) {
