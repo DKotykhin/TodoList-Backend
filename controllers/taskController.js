@@ -1,33 +1,44 @@
 import ApiError from '../error/apiError.js';
 import TaskModel from '../models/Task.js';
 
-export const getAllTasks = async (req, res) => {
+export const getTasks = async (req, res) => {
 
     const tasksOnPage = req.query.limit > 0 ? req.query.limit : 0;
     const pageNumber = req.query.page > 0 ? req.query.page : 1;
 
-    let taskKey = 0;
-    switch (req.query.key) {
-        case '0': taskKey = { author: req.userId }
+    let taskFilter = { author: req.userId };
+    switch (req.query.tabKey) {
+        case '0': taskFilter = { author: req.userId }
             break;
-        case '1': taskKey = { author: req.userId, completed: false }
+        case '1': taskFilter = { author: req.userId, completed: false }
             break;
-        case '2': taskKey = { author: req.userId, completed: true }
+        case '2': taskFilter = { author: req.userId, completed: true }
             break;
-        default: taskKey = { author: req.userId }
-    }
+        default: taskFilter = { author: req.userId }
+    };
 
-    const totalTasksQty = (await TaskModel.find(taskKey)).length;
+    let sortKey = { createdAt: 1 };
+    switch (req.query.sortField) {
+        case 'createdAt': sortKey = { createdAt: req.query.sortOrder }
+            break;
+        case 'deadline': sortKey = { deadline: req.query.sortOrder }
+            break;
+        case 'title': sortKey = { title: req.query.sortOrder }
+            break;
+        default: sortKey = { createdAt: 1 }
+    };
+
+    const totalTasksQty = (await TaskModel.find(taskFilter)).length;
     const totalPagesQty = Math.ceil(totalTasksQty / tasksOnPage);
 
-    const tasks = await TaskModel.find(taskKey, {
+    const tasks = await TaskModel.find(taskFilter, {
         title: true,
         subtitle: true,
         description: true,
         completed: true,
         createdAt: true,
         deadline: true
-    }).limit(tasksOnPage).skip((pageNumber - 1) * tasksOnPage);
+    }).sort(sortKey).limit(tasksOnPage).skip((pageNumber - 1) * tasksOnPage);
 
     const tasksOnPageQty = tasks.length;
 

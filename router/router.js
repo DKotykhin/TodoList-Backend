@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { registerUserValidation, loginUserValidation, updateUserValidation, taskValidation, passwordValidation } from '../validations/validation.js';
 import { userLogin, userRegister, userDelete, userLoginByToken, userUpdate, confirmPassword } from "../controllers/userController.js";
-import { createTask, deleteTask, getAllTasks, updateTask } from "../controllers/taskController.js";
+import { createTask, deleteTask, getTasks, updateTask } from "../controllers/taskController.js";
 import { uploadAvatar, deleteAvatar } from '../controllers/uploadController.js';
 import { validationErrors, checkAuth } from '../middlewares/index.js';
 import { upload } from '../utils/multerUpload.js'
@@ -19,7 +19,7 @@ router.patch('/user/me', checkAuth, updateUserValidation, validationErrors, user
 router.post('/upload', checkAuth, upload.single('avatar'), uploadAvatar);
 router.delete('/upload', checkAuth, deleteAvatar);
 
-router.get('/task', checkAuth, getAllTasks);
+router.get('/task', checkAuth, getTasks);
 router.post('/task', checkAuth, taskValidation, validationErrors, createTask);
 router.delete('/task', checkAuth, deleteTask);
 router.patch('/task', checkAuth, taskValidation, validationErrors, updateTask);
