@@ -7,16 +7,11 @@ export const getTasks = async (req, res) => {
     const pageNumber = req.query.page > 0 ? req.query.page : 1;
 
     let taskFilter = { author: req.userId };
-    switch (req.query.tabKey) {
-        case '0': taskFilter = { author: req.userId }
-            break;
-        case '1': taskFilter = { author: req.userId, completed: false }
-            break;
-        case '2': taskFilter = { author: req.userId, completed: true }
-            break;
-        default: taskFilter = { author: req.userId }
-    };
-
+    if (req.query.tabKey === '1') taskFilter = { ...taskFilter, completed: false };
+    if (req.query.tabKey === '2') taskFilter = { ...taskFilter, completed: true };
+    if (req.query.search) taskFilter = 
+        { ...taskFilter, title: { $regex: req.query.search, $options: 'i' } };
+   
     let sortKey = { createdAt: 1 };
     switch (req.query.sortField) {
         case 'createdAt': sortKey = { createdAt: req.query.sortOrder }
