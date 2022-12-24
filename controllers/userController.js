@@ -53,7 +53,7 @@ export const userLogin = async (req, res, next) => {
     const token = generateToken(user._id);
     const { _id, name, avatarURL, createdAt } = user;
 
-    res.status(200).send({
+    res.json({
         _id, email, name, avatarURL, createdAt, token,
         message: `User ${name} successfully logged`,
     });
@@ -66,7 +66,7 @@ export const userLoginByToken = async (req, res, next) => {
     }
     const { _id, email, name, avatarURL, createdAt } = user;
 
-    res.status(200).send({
+    res.json({
         _id, email, name, avatarURL, createdAt,
         message: `User ${name} successfully logged via token`,
     });
@@ -101,7 +101,7 @@ export const userUpdate = async (req, res, next) => {
     );    
     const { _id, email, avatarURL, createdAt } = newUser;
 
-    res.status(200).send({
+    res.json({
         _id, email, name: newUser.name, avatarURL, createdAt,
         message: `User ${newUser.name} successfully updated`,
     });
@@ -122,7 +122,10 @@ export const userDelete = async (req, res, next) => {
     const taskStatus = await TaskModel.deleteMany({ author: req.userId });
     const userStatus = await UserModel.deleteOne({ _id: req.userId });
 
-    res.status(200).send({ taskStatus, userStatus, message: 'User successfully deleted' })
+    res.json({ 
+        taskStatus, userStatus, 
+        message: 'User successfully deleted' 
+    })
 }
 
 export const confirmPassword = async (req, res, next) => {
@@ -133,8 +136,11 @@ export const confirmPassword = async (req, res, next) => {
     }
     const isValidPass = await bcrypt.compare(password, user.passwordHash);
     if (!isValidPass) {
-        return res.status(200).send({ status: false, message: "Wrong password!" })
+        return res.json({ status: false, message: "Wrong password!" })
     }
 
-    res.status(200).send({ status: true, message: 'Password confirmed' })
+    res.json({ 
+        status: true, 
+        message: 'Password confirmed' 
+    })
 }

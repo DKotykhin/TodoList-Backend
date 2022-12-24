@@ -9,9 +9,9 @@ export const getTasks = async (req, res) => {
     let taskFilter = { author: req.userId };
     if (req.query.tabKey === '1') taskFilter = { ...taskFilter, completed: false };
     if (req.query.tabKey === '2') taskFilter = { ...taskFilter, completed: true };
-    if (req.query.search) taskFilter = 
+    if (req.query.search) taskFilter =
         { ...taskFilter, title: { $regex: req.query.search, $options: 'i' } };
-   
+
     let sortKey = { createdAt: 1 };
     switch (req.query.sortField) {
         case 'createdAt': sortKey = { createdAt: req.query.sortOrder }
@@ -37,7 +37,9 @@ export const getTasks = async (req, res) => {
 
     const tasksOnPageQty = tasks.length;
 
-    res.status(200).send({ totalTasksQty, totalPagesQty, tasksOnPageQty, tasks });
+    res.json({
+        totalTasksQty, totalPagesQty, tasksOnPageQty, tasks
+    });
 };
 
 export const createTask = async (req, res, next) => {
@@ -76,7 +78,7 @@ export const updateTask = async (req, res, next) => {
         return next(ApiError.forbidden("Modified forbidden"))
     }
 
-    res.status(200).send({
+    res.json({
         status,
         message: 'Task successfully updated'
     });
@@ -89,7 +91,7 @@ export const deleteTask = async (req, res, next) => {
         return next(ApiError.forbidden("Deleted forbidden"))
     }
 
-    res.status(200).send({
+    res.json({
         status,
         message: 'Task successfully deleted'
     });

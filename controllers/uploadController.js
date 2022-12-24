@@ -15,7 +15,7 @@ export const uploadAvatar = async (req, res, next) => {
     if (!user) {
         return next(ApiError.notFound("Can't find user"))
     }
-    res.status(200).send({
+    res.json({
         avatarURL: user.avatarURL,
         message: "Avatar successfully upload.",
     });
@@ -36,7 +36,7 @@ export const deleteAvatar = async (req, res, next) => {
             { returnDocument: 'after' },
         );
 
-        res.status(200).send({
+        res.json({
             avatarURL: updateUser.avatarURL,
             message: "Avatar successfully deleted.",
         });
