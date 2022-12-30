@@ -94,16 +94,16 @@ export const userUpdate = async (req, res, next) => {
             return next(ApiError.badRequest("The same name!"))
         }
     }
-    const newUser = await UserModel.findOneAndUpdate(
+    const updatedUser = await UserModel.findOneAndUpdate(
         { _id: req.userId },
         { name, passwordHash },
         { returnDocument: 'after' },
     );    
-    const { _id, email, avatarURL, createdAt } = newUser;
+    const { _id, email, avatarURL, createdAt } = updatedUser;
 
     res.json({
-        _id, email, name: newUser.name, avatarURL, createdAt,
-        message: `User ${newUser.name} successfully updated`,
+        _id, email, name: updatedUser.name, avatarURL, createdAt,
+        message: `User ${updatedUser.name} successfully updated`,
     });
 }
 
