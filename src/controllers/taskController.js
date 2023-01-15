@@ -3,25 +3,23 @@ import TaskModel from '../models/Task.js';
 
 export const getTasks = async (req, res) => {
 
-    const tasksOnPage = req.query.limit > 0 ? req.query.limit : 0;
-    const pageNumber = req.query.page > 0 ? req.query.page : 1;
+    const { userId, query: { limit, page, tabKey, sortField, sortOrder, search } } = req;
 
-    let taskFilter = { author: req.userId };
-    if (req.query.tabKey === '1') taskFilter = { ...taskFilter, completed: false };
-    if (req.query.tabKey === '2') taskFilter = { ...taskFilter, completed: true };
-    if (req.query.search) taskFilter =
-        { ...taskFilter, title: { $regex: req.query.search, $options: 'i' } };
+    const parseLimit = parseInt(limit);
+    const tasksOnPage = parseLimit > 0 ? parseLimit : 6;
 
-    let sortKey = { createdAt: 1 };
-    switch (req.query.sortField) {
-        case 'createdAt': sortKey = { createdAt: req.query.sortOrder }
-            break;
-        case 'deadline': sortKey = { deadline: req.query.sortOrder }
-            break;
-        case 'title': sortKey = { title: req.query.sortOrder }
-            break;
-        default: sortKey = { createdAt: 1 }
-    };
+    const parsePage = parseInt(page)
+    const pageNumber = parsePage > 0 ? parsePage : 1;
+
+    let taskFilter = { author: userId };
+    if (tabKey === '1') taskFilter = { ...taskFilter, completed: false };
+    if (tabKey === '2') taskFilter = { ...taskFilter, completed: true };
+    if (search) taskFilter =
+        { ...taskFilter, title: { $regex: search, $options: 'i' } };
+
+    const map = new Map();
+    map.set(sortField, sortOrder);
+    const sortKey = Object.fromEntries(map);
 
     const totalTasksQty = (await TaskModel.find(taskFilter)).length;
     const totalPagesQty = Math.ceil(totalTasksQty / tasksOnPage);
