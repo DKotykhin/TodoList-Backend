@@ -64,7 +64,8 @@ export const createTask = async (req, res, next) => {
 
 export const updateTask = async (req, res, next) => {
     const { title, subtitle, description, _id, completed, deadline } = req.body;
-    const status = await TaskModel.updateOne(
+
+    const updatedTask = await TaskModel.findOneAndUpdate(
         { _id, author: req.userId },
         {
             $set: {
@@ -74,26 +75,35 @@ export const updateTask = async (req, res, next) => {
                 completed,
                 deadline
             }
-        });
-    if (!status.modifiedCount) {
+        },
+        { returnDocument: 'after' },
+    );
+    if (!updatedTask) {
         return next(ApiError.forbidden("Modified forbidden"))
     }
 
     res.json({
-        status,
+        _id,
+        title: updatedTask.title,
+        subtitle: updatedTask.subtitle,
+        description: updatedTask.description,
+        completed: updatedTask.completed,
+        deadline: updatedTask.deadline,
+        createdAt: updatedTask.createdAt,
         message: 'Task successfully updated'
     });
 };
 
 export const deleteTask = async (req, res, next) => {
     const { _id } = req.body;
-    const status = await TaskModel.deleteOne({ _id, author: req.userId });
-    if (!status.deletedCount) {
+
+    const taskStatus = await TaskModel.deleteOne({ _id, author: req.userId });
+    if (!taskStatus.deletedCount) {
         return next(ApiError.forbidden("Deleted forbidden"))
     }
 
     res.json({
-        status,
+        taskStatus,
         message: 'Task successfully deleted'
     });
 };

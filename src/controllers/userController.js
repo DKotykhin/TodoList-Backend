@@ -71,35 +71,54 @@ export const userLoginByToken = async (req, res, next) => {
     });
 }
 
-export const userUpdate = async (req, res, next) => {
-    if (Object.keys(req.body).length === 0) {
+export const userUpdateName = async (req, res, next) => {
+    if (!req.body) {
         return next(ApiError.badRequest("No data"));
     }
-    const { name, password } = req.body;
+    const { name } = req.body;
     const user = await findUserById(req.userId);
 
-    let passwordHash;
-    if (password) {
-        const isValidPass = await bcrypt.compare(password, user.passwordHash);
-        if (isValidPass) {
-            return next(ApiError.badRequest("The same password!"))
-        }
-        passwordHash = await createPasswordHash(password);
+    if (name === user.name) {
+        return next(ApiError.badRequest("The same name!"))
     }
-    if (name) {
-        if (name === user.name) {
-            return next(ApiError.badRequest("The same name!"))
-        }
-    }
+
     const updatedUser = await UserModel.findOneAndUpdate(
         { _id: req.userId },
-        { name, passwordHash },
+        { name },
         { returnDocument: 'after' },
     );
     const { _id, email, avatarURL, createdAt } = updatedUser;
 
     res.json({
         _id, email, name: updatedUser.name, avatarURL, createdAt,
+        message: `User ${updatedUser.name} successfully updated`,
+    });
+}
+
+export const userUpdatePassword = async (req, res, next) => {
+    if (!req.body) {
+        return next(ApiError.badRequest("No data"));
+    }
+    const { password } = req.body;
+    const user = await findUserById(req.userId);
+
+    const isValidPass = await bcrypt.compare(password, user.passwordHash);
+    if (isValidPass) {
+        return next(ApiError.badRequest("The same password!"))
+    }
+    const passwordHash = await createPasswordHash(password);
+
+    const updatedUser = await UserModel.findOneAndUpdate(
+        { _id: req.userId },
+        { passwordHash },
+        { returnDocument: 'after' },
+    );
+    if (!updatedUser) {
+        return next(ApiError.forbidden("Modified forbidden"))
+    }
+
+    res.json({
+        updateStatus: true,
         message: `User ${updatedUser.name} successfully updated`,
     });
 }
@@ -131,7 +150,7 @@ export const confirmPassword = async (req, res, next) => {
     }
 
     res.json({
-        status: true,
+        confirmStatus: true,
         message: 'Password confirmed'
     })
 }
