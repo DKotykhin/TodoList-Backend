@@ -5,6 +5,7 @@ import fs from 'fs';
 import UserModel from '../models/User.js';
 import TaskModel from '../models/Task.js';
 import ApiError from '../error/apiError.js';
+import { findUserById } from '../utils/findUserById.js';
 
 const generateToken = (_id) => {
     return jwt.sign(
@@ -13,7 +14,7 @@ const generateToken = (_id) => {
         { expiresIn: "2d" }
     )
 };
-const createPasswordHash = async (password) => {    
+const createPasswordHash = async (password) => {
     const salt = await bcrypt.genSalt(5);
     const passwordHash = await bcrypt.hash(password, salt);
     return passwordHash
@@ -60,10 +61,8 @@ export const userLogin = async (req, res, next) => {
 }
 
 export const userLoginByToken = async (req, res, next) => {
-    const user = await UserModel.findById(req.userId);
-    if (!user) {
-        return next(ApiError.notFound("Can't find user"))
-    }
+
+    const user = await findUserById(req.userId);
     const { _id, email, name, avatarURL, createdAt } = user;
 
     res.json({
@@ -77,11 +76,9 @@ export const userUpdate = async (req, res, next) => {
         return next(ApiError.badRequest("No data"));
     }
     const { name, password } = req.body;
+    const user = await findUserById(req.userId);
+
     let passwordHash;
-    const user = await UserModel.findById(req.userId);
-    if (!user) {
-        return next(ApiError.notFound("Can't find user"))
-    }
     if (password) {
         const isValidPass = await bcrypt.compare(password, user.passwordHash);
         if (isValidPass) {
@@ -98,7 +95,7 @@ export const userUpdate = async (req, res, next) => {
         { _id: req.userId },
         { name, passwordHash },
         { returnDocument: 'after' },
-    );    
+    );
     const { _id, email, avatarURL, createdAt } = updatedUser;
 
     res.json({
@@ -108,10 +105,7 @@ export const userUpdate = async (req, res, next) => {
 }
 
 export const userDelete = async (req, res, next) => {
-    const user = await UserModel.findById(req.userId);
-    if (!user) {
-        return next(ApiError.notFound("Can't find user"))
-    }
+    const user = await findUserById(req.userId);
     if (user.avatarURL) {
         fs.unlink("uploads/" + user.avatarURL.split('/')[2], async (err) => {
             if (err) {
@@ -122,25 +116,22 @@ export const userDelete = async (req, res, next) => {
     const taskStatus = await TaskModel.deleteMany({ author: req.userId });
     const userStatus = await UserModel.deleteOne({ _id: req.userId });
 
-    res.json({ 
-        taskStatus, userStatus, 
-        message: 'User successfully deleted' 
+    res.json({
+        taskStatus, userStatus,
+        message: 'User successfully deleted'
     })
 }
 
 export const confirmPassword = async (req, res, next) => {
     const { password } = req.body;
-    const user = await UserModel.findById(req.userId);
-    if (!user) {
-        return next(ApiError.notFound("Can't find user"))
-    }
+    const user = await findUserById(req.userId);
     const isValidPass = await bcrypt.compare(password, user.passwordHash);
     if (!isValidPass) {
         return res.json({ status: false, message: "Wrong password!" })
     }
 
-    res.json({ 
-        status: true, 
-        message: 'Password confirmed' 
+    res.json({
+        status: true,
+        message: 'Password confirmed'
     })
 }

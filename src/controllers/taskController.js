@@ -11,6 +11,9 @@ export const getTasks = async (req, res) => {
     const parsePage = parseInt(page)
     const pageNumber = parsePage > 0 ? parsePage : 1;
 
+    const parseSortField = sortField ? sortField : "createdAt";
+    const parseSortOrder = sortOrder ? sortOrder : -1;
+
     let taskFilter = { author: userId };
     if (tabKey === '1') taskFilter = { ...taskFilter, completed: false };
     if (tabKey === '2') taskFilter = { ...taskFilter, completed: true };
@@ -18,7 +21,7 @@ export const getTasks = async (req, res) => {
         { ...taskFilter, title: { $regex: search, $options: 'i' } };
 
     const map = new Map();
-    map.set(sortField, sortOrder);
+    map.set(parseSortField, parseSortOrder);
     const sortKey = Object.fromEntries(map);
 
     const totalTasksQty = (await TaskModel.find(taskFilter)).length;

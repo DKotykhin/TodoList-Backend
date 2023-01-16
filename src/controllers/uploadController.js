@@ -2,8 +2,9 @@ import fs from 'fs';
 
 import UserModel from '../models/User.js';
 import ApiError from '../error/apiError.js';
+import { findUserById } from '../utils/findUserById.js';
 
-export const uploadAvatar = async (req, res, next) => {    
+export const uploadAvatar = async (req, res, next) => {
     if (!req.file) {
         return next(ApiError.notFound("No file to upload"))
     }
@@ -22,10 +23,7 @@ export const uploadAvatar = async (req, res, next) => {
 }
 
 export const deleteAvatar = async (req, res, next) => {
-    const user = await UserModel.findById(req.userId);
-    if (!user) {
-        return next(ApiError.notFound("Can't find user"))
-    }
+    const user = await findUserById(req.userId);
     fs.unlink("uploads/" + user.avatarURL.split('/')[2], async (err) => {
         if (err) {
             return next(ApiError.internalError("Can't delete avatar"))
