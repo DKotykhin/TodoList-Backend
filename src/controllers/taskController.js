@@ -3,7 +3,7 @@ import taskService from '../services/taskService.js';
 class TaskController {
     async get(req, res, next) {
         try {
-            const tasksData = await taskService.get(req.body, req.userId);
+            const tasksData = await taskService.get(req.query, req.userId);
 
             res.json(tasksData);
 
