@@ -12,18 +12,23 @@ class TaskService {
         const parsePage = parseInt(page)
         const pageNumber = parsePage > 0 ? parsePage : 1;
 
-        const parseSortField = sortField ? sortField : "createdAt";
-        const parseSortOrder = sortOrder ? sortOrder : -1;
+        const parseSortField = sortField === "createdAt" ? sortField
+            : sortField === "deadline" ? sortField
+                : sortField === "title" ? sortField
+                    : "createdAt";
+        const parseSortOrder = parseInt(sortOrder) === -1 ? -1
+            : parseInt(sortOrder) === 1 ? 1
+                : -1;
+
+        const map = new Map();
+        map.set(parseSortField, parseSortOrder);
+        const sortKey = Object.fromEntries(map);
 
         let taskFilter = { author: userId };
         if (tabKey === '1') taskFilter = { ...taskFilter, completed: false };
         if (tabKey === '2') taskFilter = { ...taskFilter, completed: true };
         if (search) taskFilter =
             { ...taskFilter, title: { $regex: search, $options: 'i' } };
-
-        const map = new Map();
-        map.set(parseSortField, parseSortOrder);
-        const sortKey = Object.fromEntries(map);
 
         const totalTasksQty = (await TaskModel.find(taskFilter)).length;
         const totalPagesQty = Math.ceil(totalTasksQty / tasksOnPage);
@@ -80,7 +85,7 @@ class TaskService {
         return updatedTask;
     }
 
-    async delete(taskId, userId) {        
+    async delete(taskId, userId) {
         const { _id } = taskId;
 
         const taskStatus = await TaskModel.deleteOne({ _id, author: userId });
