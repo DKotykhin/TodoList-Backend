@@ -1,28 +1,29 @@
 import { Router } from "express";
 
-import { registerUserValidation, loginUserValidation, taskValidation, passwordValidation, nameValidation } from '../validations/validation.js';
-import { userLogin, userRegister, userDelete, userLoginByToken, confirmPassword, userUpdateName, userUpdatePassword } from "../controllers/userController.js";
-import { createTask, deleteTask, getTasks, updateTask } from "../controllers/taskController.js";
-import { uploadAvatar, deleteAvatar } from '../controllers/uploadController.js';
+import userController from "../controllers/userController.js";
+import avatarController from "../controllers/avatarController.js";
+import taskController from "../controllers/taskController.js";
+
+import validation from "../validations/validation.js";
 import { validationErrors, checkAuth } from '../middlewares/index.js';
 import { upload } from '../utils/multerUpload.js'
 
 const router = new Router();
 
-router.get('/user/me', checkAuth, userLoginByToken);
-router.post('/user/login', loginUserValidation, validationErrors, userLogin);
-router.post('/user/register', registerUserValidation, validationErrors, userRegister);
-router.post('/user/password', checkAuth, passwordValidation, validationErrors, confirmPassword);
-router.patch('/user/name', checkAuth, nameValidation, validationErrors, userUpdateName);
-router.patch('/user/password', checkAuth, passwordValidation, validationErrors, userUpdatePassword);
-router.delete('/user/me', checkAuth, userDelete);
+router.get('/user/me', checkAuth, userController.loginByToken);
+router.post('/user/login', validation.login, validationErrors, userController.login);
+router.post('/user/register', validation.register, validationErrors, userController.register);
+router.patch('/user/name', checkAuth, validation.name, validationErrors, userController.updateName);
+router.post('/user/password', checkAuth, validation.password, validationErrors, userController.confirmPassword);
+router.patch('/user/password', checkAuth, validation.password, validationErrors, userController.updatePassword);
+router.delete('/user/me', checkAuth, userController.delete);
 
-router.post('/upload', checkAuth, upload.single('avatar'), uploadAvatar);
-router.delete('/upload', checkAuth, deleteAvatar);
+router.post('/upload', checkAuth, upload.single('avatar'), avatarController.upload);
+router.delete('/upload', checkAuth, avatarController.delete);
 
-router.get('/task', checkAuth, getTasks);
-router.post('/task', checkAuth, taskValidation, validationErrors, createTask);
-router.delete('/task', checkAuth, deleteTask);
-router.patch('/task', checkAuth, taskValidation, validationErrors, updateTask);
+router.get('/task', checkAuth, taskController.get);
+router.post('/task', checkAuth, validation.task, validationErrors, taskController.create);
+router.patch('/task', checkAuth, validation.task, validationErrors, taskController.update);
+router.delete('/task', checkAuth, taskController.delete);
 
 export default router;

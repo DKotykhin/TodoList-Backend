@@ -13,36 +13,29 @@ const name = body('name')
     .isLength({ min: 3 }).withMessage('Name must be at least 3 chars long')
     .isLength({ max: 100 }).withMessage('Name must be maximum 100 chars long')
 
-export const registerUserValidation = [
-    email,
-    password,
-    name,
-    body('avatarURL')
-        .optional().isURL().withMessage('Incorrect URL')
-];
+class Validation {
+    register = [
+        email,
+        password,
+        name,
+        body('avatarURL')
+            .optional().isURL().withMessage('Incorrect URL')
+    ];
+    login = [email, password];
+    name = [name];
+    password = [password];
+    task = [
+        body('title')
+            .isLength({ min: 3 }).withMessage('Title must be at least 3 chars long'),
+        body('subtitle')
+            .optional().isString().withMessage('Incorrect data format'),
+        body('description')
+            .optional().isString().withMessage('Incorrect data format'),
+        body('completed')
+            .optional().isBoolean().withMessage('Incorrect data format'),
+        body('deadline')
+            .optional().isString().withMessage('Incorrect data format'),
+    ];
+}
 
-export const loginUserValidation = [
-    email,
-    password
-];
-
-export const passwordValidation = [
-    password
-];
-
-export const nameValidation = [
-    name
-];
-
-export const taskValidation = [
-    body('title')
-        .isLength({ min: 3 }).withMessage('Title must be at least 3 chars long'),
-    body('subtitle')
-        .optional().isString().withMessage('Incorrect data format'),
-    body('description')
-        .optional().isString().withMessage('Incorrect data format'),
-    body('completed')
-        .optional().isBoolean().withMessage('Incorrect data format'),
-    body('deadline')
-        .optional().isString().withMessage('Incorrect data format'),
-];
+export default new Validation;

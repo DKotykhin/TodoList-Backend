@@ -1,156 +1,98 @@
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import fs from 'fs';
+import userService from '../services/userService.js';
 
-import UserModel from '../models/User.js';
-import TaskModel from '../models/Task.js';
-import ApiError from '../error/apiError.js';
-import { findUserById } from '../utils/findUserById.js';
+class UserController {
+    async loginByToken(req, res, next) {
+        try {
+            const user = await userService.loginByToken(req.userId);
+            const { _id, email, name, avatarURL, createdAt } = user;
 
-const generateToken = (_id) => {
-    return jwt.sign(
-        { _id },
-        process.env.SECRET_KEY,
-        { expiresIn: "2d" }
-    )
-};
-const createPasswordHash = async (password) => {
-    const salt = await bcrypt.genSalt(5);
-    const passwordHash = await bcrypt.hash(password, salt);
-    return passwordHash
+            res.json({
+                _id, email, name, avatarURL, createdAt,
+                message: `User ${name} successfully logged via token`,
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async register(req, res, next) {
+        try {
+            const user = await userService.register(req.body);
+            const { user: { _id, email, name, createdAt }, token } = user;
+
+            res.status(201).send({
+                _id, email, name, createdAt, token,
+                message: `User ${name} successfully created`,
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async login(req, res, next) {
+        try {
+            const user = await userService.login(req.body);
+            const { user: { _id, email, name, avatarURL, createdAt }, token } = user;
+
+            res.json({
+                _id, email, name, avatarURL, createdAt, token,
+                message: `User ${name} successfully logged`,
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async updateName(req, res, next) {
+        try {
+            const updatedUser = await userService.updateName(req.body, req.userId);
+            const { _id, email, name, avatarURL, createdAt } = updatedUser;
+
+            res.json({
+                _id, email, name, avatarURL, createdAt,
+                message: `User ${name} successfully updated`,
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async confirmPassword(req, res, next) {
+        try {
+            const status = await userService.confirmPassword(req.body, req.userId);
+
+            res.json(status);
+
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async updatePassword(req, res, next) {
+        try {
+            const updatedUser = await userService.updatePassword(req.body, req.userId);
+
+            res.json({
+                updateStatus: true,
+                message: `User ${updatedUser.name} successfully updated`,
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async delete(req, res, next) {
+        try {
+            const status = await userService.delete(req.userId);
+
+            res.json({
+                ...status,
+                message: 'User successfully deleted'
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
-export const userRegister = async (req, res, next) => {
-    const { email, name, password } = req.body;
-    const candidat = await UserModel.findOne({ email });
-    if (candidat) {
-        return next(ApiError.badRequest(`User ${email} already exist`))
-    }
-    const passwordHash = await createPasswordHash(password);
-    const user = await UserModel.create({
-        email,
-        passwordHash,
-        name,
-    });
-    const token = generateToken(user._id);
-    const { _id, createdAt } = user;
-
-    res.status(201).send({
-        _id, email, name, createdAt, token,
-        message: `User ${name} successfully created`,
-    });
-}
-
-export const userLogin = async (req, res, next) => {
-    const { email, password } = req.body;
-    const user = await UserModel.findOne({ email });
-    if (!user) {
-        return next(ApiError.notFound("Can't find user"))
-    }
-    const isValidPass = await bcrypt.compare(password, user.passwordHash)
-    if (!isValidPass) {
-        return next(ApiError.badRequest('Incorrect login or password'))
-    }
-    const token = generateToken(user._id);
-    const { _id, name, avatarURL, createdAt } = user;
-
-    res.json({
-        _id, email, name, avatarURL, createdAt, token,
-        message: `User ${name} successfully logged`,
-    });
-}
-
-export const userLoginByToken = async (req, res, next) => {
-
-    const user = await findUserById(req.userId);
-    const { _id, email, name, avatarURL, createdAt } = user;
-
-    res.json({
-        _id, email, name, avatarURL, createdAt,
-        message: `User ${name} successfully logged via token`,
-    });
-}
-
-export const userUpdateName = async (req, res, next) => {
-    if (!req.body) {
-        return next(ApiError.badRequest("No data"));
-    }
-    const { name } = req.body;
-    const user = await findUserById(req.userId);
-
-    if (name === user.name) {
-        return next(ApiError.badRequest("The same name!"))
-    }
-
-    const updatedUser = await UserModel.findOneAndUpdate(
-        { _id: req.userId },
-        { name },
-        { returnDocument: 'after' },
-    );
-    const { _id, email, avatarURL, createdAt } = updatedUser;
-
-    res.json({
-        _id, email, name: updatedUser.name, avatarURL, createdAt,
-        message: `User ${updatedUser.name} successfully updated`,
-    });
-}
-
-export const userUpdatePassword = async (req, res, next) => {
-    if (!req.body) {
-        return next(ApiError.badRequest("No data"));
-    }
-    const { password } = req.body;
-    const user = await findUserById(req.userId);
-
-    const isValidPass = await bcrypt.compare(password, user.passwordHash);
-    if (isValidPass) {
-        return next(ApiError.badRequest("The same password!"))
-    }
-    const passwordHash = await createPasswordHash(password);
-
-    const updatedUser = await UserModel.findOneAndUpdate(
-        { _id: req.userId },
-        { passwordHash },
-        { returnDocument: 'after' },
-    );
-    if (!updatedUser) {
-        return next(ApiError.forbidden("Modified forbidden"))
-    }
-
-    res.json({
-        updateStatus: true,
-        message: `User ${updatedUser.name} successfully updated`,
-    });
-}
-
-export const userDelete = async (req, res, next) => {
-    const user = await findUserById(req.userId);
-    if (user.avatarURL) {
-        fs.unlink("uploads/" + user.avatarURL.split('/')[2], async (err) => {
-            if (err) {
-                return next(ApiError.internalError("Can't delete avatar"))
-            }
-        })
-    }
-    const taskStatus = await TaskModel.deleteMany({ author: req.userId });
-    const userStatus = await UserModel.deleteOne({ _id: req.userId });
-
-    res.json({
-        taskStatus, userStatus,
-        message: 'User successfully deleted'
-    })
-}
-
-export const confirmPassword = async (req, res, next) => {
-    const { password } = req.body;
-    const user = await findUserById(req.userId);
-    const isValidPass = await bcrypt.compare(password, user.passwordHash);
-    if (!isValidPass) {
-        return res.json({ status: false, message: "Wrong password!" })
-    }
-
-    res.json({
-        confirmStatus: true,
-        message: 'Password confirmed'
-    })
-}
+export default new UserController;
