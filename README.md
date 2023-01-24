@@ -3,6 +3,10 @@
 
 Backend for Todo List application
 
+<p align="center">
+  <a href="https://todolist-new17.herokuapp.com" target="blank"><img src="https://i.ibb.co/0XZYszD/icons8-microsoft-to-do-app-240.png" width="200" alt="TodoList Logo" /></a>
+</p>
+
 ## Technologies
 
 -   Backend: Node JS, Express JS, Mongoose, Multer, Yup, JWT, Bcrypt

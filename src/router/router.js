@@ -10,9 +10,10 @@ import { upload } from '../utils/multerUpload.js'
 
 const router = new Router();
 
+router.post('/auth/register', validation.register, validationErrors, userController.register);
+router.post('/auth/login', validation.login, validationErrors, userController.login);
+
 router.get('/user/me', checkAuth, userController.loginByToken);
-router.post('/user/login', validation.login, validationErrors, userController.login);
-router.post('/user/register', validation.register, validationErrors, userController.register);
 router.patch('/user/name', checkAuth, validation.name, validationErrors, userController.updateName);
 router.post('/user/password', checkAuth, validation.password, validationErrors, userController.confirmPassword);
 router.patch('/user/password', checkAuth, validation.password, validationErrors, userController.updatePassword);
