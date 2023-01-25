@@ -19,8 +19,8 @@ router.post('/user/password', checkAuth, validation.password, validationErrors, 
 router.patch('/user/password', checkAuth, validation.password, validationErrors, userController.updatePassword);
 router.delete('/user/me', checkAuth, userController.delete);
 
-router.post('/upload', checkAuth, upload.single('avatar'), avatarController.upload);
-router.delete('/upload', checkAuth, avatarController.delete);
+router.post('/avatar', checkAuth, upload.single('avatar'), avatarController.upload);
+router.delete('/avatar', checkAuth, avatarController.delete);
 
 router.get('/task', checkAuth, taskController.get);
 router.post('/task', checkAuth, validation.task, validationErrors, taskController.create);
