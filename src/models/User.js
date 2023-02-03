@@ -15,8 +15,8 @@ const userSchema = new Schema({
     avatarURL: String,
 }, {
     timestamps: true,
-},
-    { versionKey: false }
+    versionKey: false
+}
 );
 
 export default model('User', userSchema);

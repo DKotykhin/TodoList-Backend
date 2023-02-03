@@ -1,4 +1,4 @@
-import { Router } from "express";
+import express from "express";
 
 import userController from "../controllers/userController.js";
 import avatarController from "../controllers/avatarController.js";
@@ -8,7 +8,7 @@ import validation from "../validations/validation.js";
 import { validationErrors, checkAuth } from '../middlewares/index.js';
 import { upload } from '../utils/multerUpload.js'
 
-const router = new Router();
+const router = express.Router();
 
 router.post('/auth/register', validation.register, validationErrors, userController.register);
 router.post('/auth/login', validation.login, validationErrors, userController.login);

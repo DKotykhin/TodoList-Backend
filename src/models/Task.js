@@ -20,8 +20,8 @@ const taskSchema = new Schema({
     deadline: Date
 }, {
     timestamps: true,
-},
-    { versionKey: false }
+    versionKey: false
+}
 );
 
 export default model('Task', taskSchema);
