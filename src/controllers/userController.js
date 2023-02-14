@@ -93,6 +93,18 @@ class UserController {
             next(error)
         }
     }
+
+    async statistic(req, res, next) {
+        try {
+            const taskStatistic = await userService.statistic(req.userId);
+            res.json({
+                ...taskStatistic,
+                message: 'Statistic successfully obtained'
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new UserController;

@@ -14,6 +14,7 @@ router.post('/auth/register', validation.register, validationErrors, userControl
 router.post('/auth/login', validation.login, validationErrors, userController.login);
 
 router.get('/user/me', checkAuth, userController.loginByToken);
+router.get('/user/statistic', checkAuth, userController.statistic);
 router.patch('/user/name', checkAuth, validation.name, validationErrors, userController.updateName);
 router.post('/user/password', checkAuth, validation.password, validationErrors, userController.confirmPassword);
 router.patch('/user/password', checkAuth, validation.password, validationErrors, userController.updatePassword);
