@@ -16,14 +16,13 @@ class TaskService {
             : sortField === "deadline" ? sortField
                 : sortField === "title" ? sortField
                     : "createdAt";
-        const parseSortOrder = parseInt(sortOrder) === -1 ? -1
-            : parseInt(sortOrder) === 1 ? 1
-                : -1;
 
-        const map = new Map();
-        map.set(parseSortField, parseSortOrder);
-        const sortKey = Object.fromEntries(map);
+        const parseSortOrder = sortOrder === '-1' || sortOrder === '1' ? sortOrder : '-1';
 
+        const sortKey = {
+            [parseSortField]: +parseSortOrder
+        };
+        
         let taskFilter = { author: userId };
         if (tabKey === '1') taskFilter = { ...taskFilter, completed: false };
         if (tabKey === '2') taskFilter = { ...taskFilter, completed: true };
