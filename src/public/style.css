@@ -1,12 +1,30 @@
 body {
     background-color: rgba(230, 230, 230, 0.2);
+    font-family: monospace;
+    text-align: center;    
 }
 
 .title {
-    font-family: monospace;
-    text-align: center;    
     margin-top: 100px;
-    color: rgb(0, 161, 182);
-    font-size: 50px;
+    color: #00a1b6;
+    font-size: 70px;
     font-weight: 700;
+}
+.subtitle {
+    margin: 20px 0;
+    color: #808080;
+    font-size: 40px;
+    font-weight: 700;
+}
+.text {
+    margin: 20px 0;
+    color: #5a5a5a;
+    font-size: 22px;
+}
+.link a {
+    font-size: 16px;
+    text-decoration: none;
+}
+.link a:hover {
+    text-decoration: underline;
 }
