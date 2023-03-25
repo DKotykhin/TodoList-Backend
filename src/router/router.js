@@ -23,7 +23,8 @@ router.delete('/user/me', checkAuth, userController.delete);
 router.post('/avatar', checkAuth, upload.single('avatar'), avatarController.upload);
 router.delete('/avatar', checkAuth, avatarController.delete);
 
-router.get('/task', checkAuth, taskController.get);
+router.get('/task', checkAuth, taskController.getAll);
+router.get('/task/:id', checkAuth, taskController.getOne);
 router.post('/task', checkAuth, validation.task, validationErrors, taskController.create);
 router.patch('/task', checkAuth, validation.task, validationErrors, taskController.update);
 router.delete('/task', checkAuth, taskController.delete);

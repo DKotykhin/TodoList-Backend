@@ -2,7 +2,7 @@ import ApiError from '../error/apiError.js';
 import TaskModel from '../models/Task.js';
 
 class TaskService {
-    async get(data, userId) {
+    async getAll(data, userId) {
 
         const { limit, page, tabKey, sortField, sortOrder, search } = data;
 
@@ -22,7 +22,7 @@ class TaskService {
         const sortKey = {
             [parseSortField]: +parseSortOrder
         };
-        
+
         let taskFilter = { author: userId };
         if (tabKey === '1') taskFilter = { ...taskFilter, completed: false };
         if (tabKey === '2') taskFilter = { ...taskFilter, completed: true };
@@ -44,6 +44,13 @@ class TaskService {
         const tasksOnPageQty = tasks.length;
 
         return { totalTasksQty, totalPagesQty, tasksOnPageQty, tasks };
+    }
+
+    async getOne(_id, userId) {
+        const task = await TaskModel.findOne({ _id, author: userId });
+        if (!task) throw ApiError.notFound("Can't find task");
+
+        return task;
     }
 
     async create(data, userId) {
