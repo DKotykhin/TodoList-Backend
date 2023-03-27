@@ -12,20 +12,31 @@ class TaskService {
         const parsePage = parseInt(page)
         const pageNumber = parsePage > 0 ? parsePage : 1;
 
-        const parseSortField = sortField === "createdAt" ? sortField
-            : sortField === "deadline" ? sortField
-                : sortField === "title" ? sortField
-                    : "createdAt";
-
         const parseSortOrder = sortOrder === '-1' || sortOrder === '1' ? sortOrder : '-1';
 
-        const sortKey = {
-            [parseSortField]: +parseSortOrder
+        let sortKey = {};
+        switch (sortField) {
+            case "createdAt": sortKey = { [sortField]: +parseSortOrder };
+                break;
+            case "deadline": sortKey = { [sortField]: -parseSortOrder };
+                break;
+            case "title": sortKey = { [sortField]: -parseSortOrder };
+                break;
+            default: sortKey = { createdAt: -1 };
         };
 
-        let taskFilter = { author: userId };
-        if (tabKey === '1') taskFilter = { ...taskFilter, completed: false };
-        if (tabKey === '2') taskFilter = { ...taskFilter, completed: true };
+        let taskFilter = {};
+        switch (tabKey) {
+            case '1':
+                taskFilter = { author: userId, completed: false };
+                break;
+            case '2':
+                taskFilter = { author: userId, completed: true };
+                break;
+            default:
+                taskFilter = { author: userId };
+        };
+
         if (search) taskFilter =
             { ...taskFilter, title: { $regex: search, $options: 'i' } };
 
