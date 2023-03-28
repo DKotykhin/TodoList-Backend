@@ -16,19 +16,22 @@ class TaskService {
 
         let sortKey = {};
         switch (sortField) {
-            case "createdAt": sortKey = { [sortField]: +parseSortOrder };
+            case "createdAt": sortKey = { [sortField]: -parseSortOrder };
                 break;
-            case "deadline": sortKey = { [sortField]: -parseSortOrder };
+            case "deadline": sortKey = { [sortField]: +parseSortOrder };
                 break;
-            case "title": sortKey = { [sortField]: -parseSortOrder };
+            case "title": sortKey = { [sortField]: +parseSortOrder };
                 break;
             default: sortKey = { createdAt: -1 };
         };
 
         let taskFilter = {};
         switch (tabKey) {
-            case '1':
+            case '0':
                 taskFilter = { author: userId, completed: false };
+                break;
+            case '1':
+                taskFilter = { author: userId, deadline: { $lt: new Date() }, completed: false };
                 break;
             case '2':
                 taskFilter = { author: userId, completed: true };

@@ -145,11 +145,10 @@ class UserService {
                 completed: true
             }
         );
-        const nowDate = new Date().toISOString();
         const overdueTasks = TaskModel.countDocuments(
             {
                 author: _id,
-                deadline: { $lt: nowDate },
+                deadline: { $lt: new Date() },
                 completed: false
             }
         );
