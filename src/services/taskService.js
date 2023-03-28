@@ -12,7 +12,7 @@ class TaskService {
         const parsePage = parseInt(page)
         const pageNumber = parsePage > 0 ? parsePage : 1;
 
-        const parseSortOrder = sortOrder === '-1' || sortOrder === '1' ? sortOrder : '-1';
+        const parseSortOrder = sortOrder === '-1' || sortOrder === '1' ? sortOrder : '1';
 
         let sortKey = {};
         switch (sortField) {
@@ -22,7 +22,7 @@ class TaskService {
                 break;
             case "title": sortKey = { [sortField]: +parseSortOrder };
                 break;
-            default: sortKey = { createdAt: -1 };
+            default: sortKey = { createdAt: 1 };
         };
 
         let taskFilter = {};
