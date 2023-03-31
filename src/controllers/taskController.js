@@ -13,7 +13,7 @@ class TaskController {
     }
 
     async getOne(req, res, next) {
-        try {           
+        try {
             const task = await taskService.getOne(req.params.id, req.userId);
 
             res.json(task);
@@ -26,10 +26,9 @@ class TaskController {
     async create(req, res, next) {
         try {
             const newTask = await taskService.create(req.body, req.userId);
-            const { _id, title, subtitle, description, completed, createdAt, deadline } = newTask;
 
             res.status(201).send({
-                _id, title, subtitle, description, completed, createdAt, deadline,
+                ...newTask._doc,
                 message: 'Task successfully created'
             });
         } catch (error) {
@@ -40,10 +39,9 @@ class TaskController {
     async update(req, res, next) {
         try {
             const updatedTask = await taskService.update(req.body, req.userId);
-            const { _id, title, subtitle, description, completed, createdAt, deadline } = updatedTask;
 
             res.json({
-                _id, title, subtitle, description, completed, createdAt, deadline,
+                ...updatedTask._doc,
                 message: 'Task successfully updated'
             });
         } catch (error) {

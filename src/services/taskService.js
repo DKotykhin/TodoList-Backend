@@ -46,14 +46,10 @@ class TaskService {
         const totalTasksQty = (await TaskModel.find(taskFilter)).length;
         const totalPagesQty = Math.ceil(totalTasksQty / tasksOnPage);
 
-        const tasks = await TaskModel.find(taskFilter, {
-            title: true,
-            subtitle: true,
-            description: true,
-            completed: true,
-            createdAt: true,
-            deadline: true
-        }).sort(sortKey).limit(tasksOnPage).skip((pageNumber - 1) * tasksOnPage);
+        const tasks = await TaskModel.find(taskFilter, { author: false })
+            .sort(sortKey)
+            .limit(tasksOnPage)
+            .skip((pageNumber - 1) * tasksOnPage);
 
         const tasksOnPageQty = tasks.length;
 
@@ -61,7 +57,7 @@ class TaskService {
     }
 
     async getOne(_id, userId) {
-        const task = await TaskModel.findOne({ _id, author: userId });
+        const task = await TaskModel.findOne({ _id, author: userId }, { author: false });
         if (!task) throw ApiError.notFound("Can't find task");
 
         return task;
@@ -96,7 +92,7 @@ class TaskService {
                     deadline
                 }
             },
-            { returnDocument: 'after' },
+            { returnDocument: 'after', fields: { author: false } },
         );
         if (!updatedTask) {
             throw ApiError.forbidden("Modified forbidden")
