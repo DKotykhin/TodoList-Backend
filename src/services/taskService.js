@@ -81,6 +81,9 @@ class TaskService {
     async update(data, userId) {
         const { title, subtitle, description, _id, completed, deadline } = data;
 
+        let completedAt = null;
+        if (completed) completedAt = new Date();
+
         const updatedTask = await TaskModel.findOneAndUpdate(
             { _id, author: userId },
             {
@@ -89,7 +92,8 @@ class TaskService {
                     subtitle,
                     description,
                     completed,
-                    deadline
+                    deadline,
+                    completedAt,
                 }
             },
             { returnDocument: 'after', fields: { author: false } },

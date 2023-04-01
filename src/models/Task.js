@@ -17,6 +17,7 @@ const taskSchema = new Schema({
         type: Boolean,
         default: false
     },
+    completedAt: Date,
     deadline: Date
 }, {
     timestamps: true,
