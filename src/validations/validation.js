@@ -1,17 +1,20 @@
 import { body } from 'express-validator';
 
 const email = body('email')
-    .isEmail().withMessage('Incorrect email format');
+    .isEmail().withMessage('Incorrect email format')
+    .normalizeEmail();
 
 const password = body('password')
     .isString().withMessage('Incorrect data format')
     .isLength({ min: 8 }).withMessage('Password must be at least 8 chars long')
-    .isLength({ max: 100 }).withMessage('Password must be maximum 100 chars long');
+    .isLength({ max: 100 }).withMessage('Password must be maximum 100 chars long')
+    .trim();
 
 const name = body('name')
     .isString().withMessage('Incorrect data format')
     .isLength({ min: 3 }).withMessage('Name must be at least 3 chars long')
     .isLength({ max: 100 }).withMessage('Name must be maximum 100 chars long')
+    .trim();
 
 class Validation {
     register = [

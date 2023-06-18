@@ -12,6 +12,8 @@ const router = express.Router();
 
 router.post('/auth/register', validation.register, validationErrors, userController.register);
 router.post('/auth/login', validation.login, validationErrors, userController.login);
+router.post('/auth/reset', userController.resetPassword);
+router.patch('/auth/reset', userController.setNewPassword);
 
 router.get('/user/me', checkAuth, userController.loginByToken);
 router.get('/user/statistic', checkAuth, userController.statistic);

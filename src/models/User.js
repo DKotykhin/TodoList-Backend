@@ -13,6 +13,10 @@ const userSchema = new Schema({
     },
     name: String,
     avatarURL: String,
+    resetPassword: {
+        token: String,
+        expire: Date,
+    },
 }, {
     timestamps: true,
     versionKey: false

@@ -1,11 +1,13 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import fs from 'fs';
+import crypto from 'crypto';
 
 import UserModel from '../models/User.js';
 import TaskModel from '../models/Task.js';
 import ApiError from '../error/apiError.js';
 import { findUserById } from '../utils/findUserById.js';
+import { mailConfig } from '../utils/mailConfig.js';
 
 const generateToken = (_id) => {
     return jwt.sign(
@@ -118,6 +120,54 @@ class UserService {
         }
 
         return updatedUser;
+    }
+
+    async resetPassword(email) {
+        const user = await UserModel.findOne({ email });
+        if (!user) {
+            throw ApiError.notFound("Can't find user")
+        }
+
+        const buffer = crypto.randomBytes(16);
+        if (!buffer) throw ApiError.internalError("Something get wrong")
+        const token = buffer.toString('hex');
+
+        let status;
+        try {
+            status = await mailConfig(token, email);
+        } catch (err) {
+            throw ApiError.internalError(err.message || "Can't send email")
+        }
+
+        const updatedUser = await UserModel.findOneAndUpdate(
+            { email },
+            {
+                'resetPassword.token': token,
+                'resetPassword.expire': Date.now() + (3600 * 1000)
+            },
+            { returnDocument: 'after' },
+        );
+        if (!updatedUser) {
+            throw ApiError.forbidden("Modified forbidden")
+        } else return status;
+    }
+
+    async setNewPassword(body) {
+        const { token, password } = body;
+        const passwordHash = await createPasswordHash(password);
+        const updatedUser = await UserModel.findOneAndUpdate(
+            { 'resetPassword.token': token, 'resetPassword.expire': { $gt: Date.now() } },
+            {
+                $set: {
+                    passwordHash,
+                    'resetPassword.token': '',
+                }
+            },
+            { returnDocument: 'after' },
+        );
+        if (!updatedUser) {
+            throw ApiError.forbidden("Modified forbidden")
+        } else return updatedUser;
     }
 
     async delete(_id) {

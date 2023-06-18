@@ -10,6 +10,7 @@ import { errorHandler } from "./middlewares/index.js";
 
 dotenv.config();
 
+mongoose.set('strictQuery', true);
 mongoose
     .connect(process.env.MONGO_DB)
     .then(() => console.log('Mongoose DB connected...'))

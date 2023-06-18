@@ -81,6 +81,32 @@ class UserController {
         }
     }
 
+    async resetPassword(req, res, next) {
+        try {
+            const status = await userService.resetPassword(req.body.email);
+
+            res.json({
+                status: status.response,
+                message: `Email successfully sent to ${status.accepted}`,
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async setNewPassword(req, res, next) {
+        try {
+            const updatedUser = await userService.setNewPassword(req.body);
+
+            res.json({
+                updateStatus: true,
+                message: `${updatedUser.name} password successfully updated`,
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
+
     async delete(req, res, next) {
         try {
             const status = await userService.delete(req.userId);
