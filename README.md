@@ -10,7 +10,7 @@ Backend for Todo List application
 ## Technologies
 
 -   Backend: Node JS, Express, Mongoose, Multer, Yup, JWT, Nodemailer, Sharp, Bcrypt
--   Frontend: React, Redux Toolkit, Axios, Typescript, React Hook Form, MUI, Markdown, Tostify, SCSS
+-   Frontend: React, Redux Toolkit, Axios, Typescript, React Hook Form, Material UI, React Markdown, React Tostify, Yup, Date-fns, SCSS
 -   Database: Mongo DB
 
 ## Features
