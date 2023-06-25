@@ -143,7 +143,7 @@ class UserService {
             { email },
             {
                 'resetPassword.token': token,
-                'resetPassword.expire': Date.now() + (3600 * 1000)
+                'resetPassword.expire': Date.now() + (3600 * 1000),
             },
             { returnDocument: 'after' },
         );
@@ -160,7 +160,9 @@ class UserService {
             {
                 $set: {
                     passwordHash,
-                    'resetPassword.token': '',
+                    'resetPassword.token': null,
+                    'resetPassword.expire': null,
+                    'resetPassword.changed': Date.now(),
                 }
             },
             { returnDocument: 'after' },

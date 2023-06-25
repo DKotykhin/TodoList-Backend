@@ -5,13 +5,13 @@ import ApiError from '../error/apiError.js';
 import { findUserById } from '../utils/findUserById.js';
 
 class AvatarService {
-    async upload(file, _id) {
-        if (!file) {
-            throw ApiError.notFound("No file to upload")
+    async upload(fileName, _id) {
+        if (!fileName) {
+            throw ApiError.notFound("File name error")
         }
         const user = await UserModel.findOneAndUpdate(
             { _id },
-            { avatarURL: `/upload/${file.filename}` },
+            { avatarURL: `/upload/${fileName}` },
             { returnDocument: 'after' },
         );
         if (!user) {

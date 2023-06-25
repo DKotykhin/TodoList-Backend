@@ -1,14 +1,13 @@
 import express from "express";
 import mongoose from "mongoose";
-import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
 import favicon from 'serve-favicon';
 
 import router from './router/router.js';
-import { errorHandler } from "./middlewares/index.js";
+import errorHandler from "./error/errorHandler.js";
 
-dotenv.config();
+import 'dotenv/config';
 
 mongoose.set('strictQuery', true);
 mongoose

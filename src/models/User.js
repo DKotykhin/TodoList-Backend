@@ -16,6 +16,7 @@ const userSchema = new Schema({
     resetPassword: {
         token: String,
         expire: Date,
+        changed: Date,
     },
 }, {
     timestamps: true,

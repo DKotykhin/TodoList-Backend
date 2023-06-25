@@ -1,19 +1,16 @@
 import express from "express";
 
-import userController from "../controllers/userController.js";
-import avatarController from "../controllers/avatarController.js";
-import taskController from "../controllers/taskController.js";
+import { userController, avatarController, taskController } from "../controllers/_index.js";
+import { validationErrors, checkAuth, resizeImages, uploadFile } from '../middlewares/_index.js';
 
 import validation from "../validations/validation.js";
-import { validationErrors, checkAuth } from '../middlewares/index.js';
-import { upload } from '../utils/multerUpload.js'
 
 const router = express.Router();
 
 router.post('/auth/register', validation.register, validationErrors, userController.register);
 router.post('/auth/login', validation.login, validationErrors, userController.login);
-router.post('/auth/reset', userController.resetPassword);
-router.patch('/auth/reset', userController.setNewPassword);
+router.post('/auth/reset', validation.email, validationErrors, userController.resetPassword);
+router.patch('/auth/reset', validation.setNewPassword, validationErrors, userController.setNewPassword);
 
 router.get('/user/me', checkAuth, userController.loginByToken);
 router.get('/user/statistic', checkAuth, userController.statistic);
@@ -22,7 +19,7 @@ router.post('/user/password', checkAuth, validation.password, validationErrors, 
 router.patch('/user/password', checkAuth, validation.password, validationErrors, userController.updatePassword);
 router.delete('/user/me', checkAuth, userController.delete);
 
-router.post('/avatar', checkAuth, upload.single('avatar'), avatarController.upload);
+router.post('/avatar', checkAuth, uploadFile, resizeImages, avatarController.upload);
 router.delete('/avatar', checkAuth, avatarController.delete);
 
 router.get('/task', checkAuth, taskController.getAll);

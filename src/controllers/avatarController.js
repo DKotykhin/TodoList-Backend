@@ -1,9 +1,9 @@
 import avatarService from '../services/avatarService.js';
 
 class AvatarController {
-    async upload(req, res, next) {
+    async upload(req, res, next) {        
         try {
-            const user = await avatarService.upload(req.file, req.userId)
+            const user = await avatarService.upload(req.fileName, req.userId)
             res.json({
                 avatarURL: user.avatarURL,
                 message: "Avatar successfully upload.",

@@ -16,6 +16,9 @@ const name = body('name')
     .isLength({ max: 100 }).withMessage('Name must be maximum 100 chars long')
     .trim();
 
+const token = body('token')
+    .isString().withMessage('Incorrect data format')
+
 class Validation {
     register = [
         email,
@@ -26,7 +29,9 @@ class Validation {
     ];
     login = [email, password];
     name = [name];
+    email = [email];
     password = [password];
+    setNewPassword = [password, token];
     task = [
         body('title')
             .isLength({ min: 3 }).withMessage('Title must be at least 3 chars long'),
